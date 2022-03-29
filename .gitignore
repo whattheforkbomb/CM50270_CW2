@@ -127,3 +127,33 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# LaTex Aux Files - courtesy of https://gist.github.com/kogakure/149016
+*.aux
+*.glo
+*.idx
+*.log
+*.toc
+*.ist
+*.acn
+*.acr
+*.alg
+*.bbl
+*.blg
+*.dvi
+*.glg
+*.gls
+*.ilg
+*.ind
+*.lof
+*.lot
+*.maf
+*.mtc
+*.mtc1
+*.out
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+
+# Files generated when moving from Windows to WSL
+*:Zone.Identifier

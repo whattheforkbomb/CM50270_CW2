@@ -1,0 +1,1532 @@
+%%
+%% This is file `bath-bst-v1.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% bath-bst.dtx  (with options: `tex1')
+%% ----------------------------------------------------------------
+%% bath-bst --- Harvard referencing style as recommended by the University of Bath Library
+%% Author:  Alex Ball
+%% E-mail:  a.j.ball@bath.ac.uk
+%% License: Released under the LaTeX Project Public License v1.3c or later
+%% See:     http://www.latex-project.org/lppl.txt
+%% ----------------------------------------------------------------
+%% 
+\ProvidesFile{bath-bst-v1.tex}
+    [2021/02/25 v4.0 Harvard referencing style as recommended by the University of Bath Library]
+
+\documentclass[10pt,a4paper]{article}
+\usepackage[british]{babel}
+\usepackage[hmargin=3cm,vmargin=2.5cm]{geometry}
+\frenchspacing
+
+
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage{CJKutf8}
+\else
+  \ifLuaTeX
+    \usepackage{luatexja-fontspec}
+    \setmainjfont{IPAexGothic}
+  \else
+    \ifXeTeX
+    \usepackage{ctex}
+    \fi
+  \fi
+\fi
+
+
+\usepackage{xpatch,csquotes,xcolor,xparse,multicol,fancyvrb}
+\xdefinecolor{Green}{rgb}{0,.5,0}
+\xdefinecolor{Slate}{RGB}{80,86,94}
+\xdefinecolor{BathStone}{RGB}{213,211,185}
+\colorlet{ok}{Green}
+\colorlet{todo}{red}
+\colorlet{hacked}{orange}
+\colorlet{manual}{purple}
+\RecustomVerbatimEnvironment
+  {Verbatim}{Verbatim}
+  {commentchar=\%}
+
+\usepackage[tightLists=false]{markdown}
+\markdownSetup{rendererPrototypes={%
+    link = {\href{#3}{#1}}%
+}}
+
+\usepackage{fontawesome}[2015/07/07]
+\newcommand{\booksym}{\makebox[1em][c]{\faicon{book}}}
+\newcommand{\cogsym}{\makebox[1em][c]{\faicon{cog}}}
+\makeatletter
+\newcommand{\hangfrom}[1]{%
+  \setbox\@tempboxa\hbox{{#1}}%
+  \hangindent \wd\@tempboxa\noindent\box\@tempboxa}
+\makeatother
+\newenvironment{tips}{%
+  \begin{list}{\makebox[2em][c]{\faLightbulbO}}{%
+    \setlength{\leftmargin}{2em}
+    \setlength{\labelwidth}{2em}
+    \setlength{\labelsep}{0pt}}
+}{\end{list}}
+\newenvironment{info}{%
+  \begin{list}{\makebox[2em][c]{\faInfoCircle}}{%
+    \setlength{\leftmargin}{2em}
+    \setlength{\labelwidth}{2em}
+    \setlength{\labelsep}{0pt}}
+}{\end{list}}
+\newenvironment{hacks}{%
+  \begin{list}{\makebox[2em][c]{\faWrench}}{%
+    \setlength{\leftmargin}{2em}
+    \setlength{\labelwidth}{2em}
+    \setlength{\labelsep}{0pt}}
+}{\end{list}}
+
+\usepackage{tcolorbox}
+\tcbuselibrary{listings,breakable,skins,xparse}
+\colorlet{Option}{violet}
+\newcommand*{\key}[1]{\textcolor{Option}{\ttfamily #1}}
+\lstdefinelanguage{bafll}%
+  { alsoletter={.}
+  , morekeywords=[2]%
+    { add.period$
+    , call.type$
+    , change.case$
+    , chr.to.int$
+    , cite$
+    , duplicate$
+    , empty$
+    , format.name$
+    , global.max$
+    , if$
+    , int.to.chr$
+    , int.to.str$
+    , missing$
+    , newline$
+    , num.names$
+    , pop$
+    , preamble$
+    , purify$
+    , quote$
+    , skip$
+    , sort.key$
+    , stack$
+    , substring$
+    , swap$
+    , text.length$
+    , text.prefix$
+    , top$
+    , type$
+    , warning$
+    , while$
+    , width$
+    , write$
+    }
+  , morekeywords=[3]%
+    { ENTRY
+    , INTEGERS
+    , STRINGS
+    , MACRO
+    , FUNCTION
+    , READ
+    , EXECUTE
+    , ITERATE
+    , SORT
+    , REVERSE
+    }
+  , morekeywords=[1]{}
+  , otherkeywords=%
+    { +
+    , -
+    , >
+    , <
+    , =
+    , *
+    , :=
+    }
+  , sensitive=true
+  , morestring=[b]"
+  , morecomment=[l]\%
+  }[keywords,strings,comments]
+\lstloadlanguages{[LaTeX]TeX,bafll}
+\lstdefinestyle{dtxlatex}%
+  { columns=fullflexible
+  , basicstyle=\ttfamily
+  , language={[LaTeX]TeX}
+  , texcsstyle=*\color{red!75!black}
+  , commentstyle=\color{gray}\itshape
+  , moretexcs=
+    { citet
+    , citep
+    , defcitealias
+    , citepalias
+    , citetalias
+    , noop
+    , urlprefix
+    , urldateprefix
+    }
+  , moredelim=**[s][\color{violet}]{[}{]}
+  , moredelim=**[s][\color{blue!75!black}]{\{}{\}}
+  }
+\lstdefinestyle{dtxbst}%
+  { columns=fullflexible
+  , basicstyle=\ttfamily
+  , language=bafll
+  , keywordstyle=[1]\color{orange!75!black}
+  , keywordstyle=[2]\color{red!75!black}
+  , keywordstyle=[3]\color{green!50!black}
+  , commentstyle=\color{gray}\itshape
+  , stringstyle=\color{violet}
+  , mathescape=false
+  , showstringspaces=false
+  }
+\lstset{style=dtxlatex}
+\tcbset
+  { colframe = Slate
+  , colback = BathStone!25
+  , listing options =
+    { style = tcblatex
+    , style = dtxlatex
+    , basicstyle=\ttfamily\small
+    }
+  }
+\NewTColorBox{bibexbox}{D(){ok}d<>m}%
+  {bicolor
+  ,colframe = #1
+  ,colback = #1!5!white
+  ,colbacklower = white
+  ,fontlower = \footnotesize
+  ,before upper = {\hangfrom{\booksym\space}}
+  ,after upper = {\par\hangfrom{\cogsym\space}\bibentry{#3}.}
+  ,IfNoValueTF={#2}{}%
+    {overlay = {
+      \node[anchor=south east,text=teal] at (frame.south east) {#2};
+      }
+    }
+  }
+
+
+\usepackage{natbib}
+\newcommand*{\urlprefix}{Available from: }
+\newcommand*{\urldateprefix}{Accessed }
+
+\usepackage{bibentry}
+\bibliographystyle{bath}
+\nobibliography*
+
+\usepackage{readprov}
+\usepackage[british,cleanlook]{isodate}
+
+\usepackage[colorlinks,citecolor=black]{hyperref}
+\makeatletter
+\Urlmuskip=0mu plus 3mu\relax
+\mathchardef\UrlBigBreakPenalty=100\relax
+\mathchardef\UrlBreakPenalty=200\relax
+\def\UrlBigBreaks{\do\:\do\-}%
+\def\UrlBreaks{%
+  \do\.\do\@\do\/\do\\\do\!\do\_\do\|\do\;\do\>\do\]\do\)\do\}%
+  \do\,\do\?\do\'\do\+\do\=\do\#\do\$\do\&\do\*\do\^\do\"}%
+\let\do=\noexpand
+\makeatother
+
+\sloppy
+
+\title{bath-bst: Harvard referencing style as recommended by the University of Bath Library}
+\author{%
+  Maintainer: Alex Ball\thanks{%
+    To contact the maintainer about this package, please visit the repository
+    where the code is hosted: \url{https://github.com/alex-ball/bathbib}.%
+  }%
+}
+\date{Package \UseVersionOf{\jobname.tex} --\printdateTeX{\UseDateOf{\jobname.tex}}}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+
+The data model offered by the standard Bib\TeX\ styles, and even the extended
+\textsf{natbib} variants, is not really rich enough to support the nuances of
+the Harvard (Bath) style. This means design decisions have to be made about
+whether to attempt some level of compatibility with other styles or craft
+something utterly unique.
+
+In the first version of \textsf{bath-bst}, the intention was to set things up
+so that, if the same \texttt{.bib} file was used with a different style, the features
+peculiar to the Harvard (Bath) style would be ignored and the remaining
+information would come out in a sensible arrangement. The recommendations of
+the style's documentation were to use the standard entry types as much as
+possible (though more semantic aliases were provided), and minimal new fields
+were introduced. For the more exotic (in Bib\TeX\ terms) demands of the style,
+extensive use was made of the (standard) \texttt{note} and (non-standard)
+\texttt{titleaddon} fields to place information properly. If you have written
+a \texttt{.bib} file according the principles in that first version, the \texttt{bath}
+style will still work as advertised for you.
+
+The second version introduced a new variant, \texttt{bathx} (`Bath extended'),
+which has a different aim. The idea with this one is that \texttt{.bib} files written
+for this style will be rendered just the same by the companion
+\textsf{biblatex-bath} style. Where possible, features from the latter have
+been emulated for Bib\TeX; otherwise, the `cheats' used in this style will
+also work under \textsf{biblatex}.
+
+Happily, it has been possible to do this while keeping most of the code in
+common. The main differences between two versions are as follows:
+
+\begin{itemize}
+\item
+  In \texttt{bath}, the \texttt{titleaddon} field is printed bare, while
+  in \texttt{bathx} it is wrapped in square brackets.
+\item
+  In \texttt{bathx} online items are marked with `[Online]' automatically,
+  while in \texttt{bath} you have to mark them thus yourself.
+\item
+  In \texttt{bathx} undated items are marked with `n.d.' automatically,
+  while in \texttt{bath} you have to give `n.d.' as the value of \texttt{year}
+  yourself.
+\end{itemize}
+
+One other change worth noting regards URL access dates. In version 1, the
+advice was to put them in \texttt{urldate}. With version 2 the advice is now
+to put them, perhaps counter-intuitively, in \texttt{urlyear}. The reason is that
+\textsf{biblatex} will complain if the value of \texttt{urldate} is in the wrong
+format, but will happily print the contents of \texttt{urlyear} literally. If
+you don't care about \textsf{biblatex} compatibility, you can continue to use
+\texttt{urldate}.
+
+This document provides a suite of examples that demonstrate and test the
+bibliography format that was recommended for version 1.0 of the style.
+
+\section{Using the style}
+
+To use the style, add these lines to your preamble:
+
+\begin{tcblisting}{listing only}
+\usepackage{natbib}
+\newcommand*{\urlprefix}{Available from: }
+\newcommand*{\urldateprefix}{Accessed }
+\bibliographystyle{bath}
+\end{tcblisting}
+
+Remember also to specify your \texttt{.bib} file at the end of the document:
+
+\begin{tcblisting}{listing only}
+\bibliography{file}
+\end{tcblisting}
+
+To make a citation in the text, use the key that corresponds to the entry in your \texttt{.bib} file:
+
+\begin{tcblisting}{}
+While collections can be supplemented by other means \citep{williams1997edd},
+the absence of an invisible collection amongst historians is noted by
+\citet[p.556]{stieg1981inh}. It may be, as \citet{burchard1965hhl} points out,
+that they have no assistants or are reluctant to delegate, or it may be
+down to economic factors \citep{adams2009tc1, adams2014tc2, gb.pa2014,
+adams2017tc3}\dots
+\end{tcblisting}
+
+Please refer to the documentation for \href{http://www.ctan.org/pkg/natbib}{\textsf{natbib}}
+for the full range of commands available for in-text citations. Be aware that the
+\textsf{natbib} option \texttt{sort} will sort citations in bibliography order,
+rather than the chronological order demanded by Harvard (Bath) -- so don't use it!
+
+\subsection{Migrating from version 2 to version 3}
+
+If you have previously used version 2 of the style, you may need to update your
+.bib file to accommodate the following changes in version 3:
+
+\begin{itemize}
+\item
+  Journal titles are now coerced to sentence case, so any capital letters you
+  want to keep need to be protected with braces.
+\item
+  Entries of type \texttt{unpublished} are now marked as unpublished. If you
+  have been using this for an item that should not be marked as unpublished
+  (e.g.~archive photographs, law reports), you can use \texttt{booklet} instead:
+  this is the other entry type (along with \texttt{misc}) that has a
+  \texttt{howpublished} field instead of a \texttt{publisher}.
+  Other entry types may work as well; indeed, some examples below have been updated to use \texttt{manual} or \texttt{report} instead.
+\item
+  Some changes to the Harvard (Bath) style cannot be applied automatically
+  (e.g.~the update to how standards are referenced), so you may need to update
+  your .bib file accordingly.
+\end{itemize}
+
+\section{Examples}
+
+The examples below are shown in three parts.
+The first, marked with \faBook, shows an extract from the
+\href{https://library.bath.ac.uk/referencing/harvard-bath}{\emph{Referencing guide: Harvard Bath}} or
+\href{https://library.bath.ac.uk/images/referencing}{\emph{Referencing images}}.
+The second, marked with \faCog, shows the reference as formatted by Bib\TeX.
+The last shows how the reference was entered in the \texttt{.bib} file.
+The bottom right corner shows the source of the example: `RX' indicates the `Reference examples (A-Z)' section of the Guide; `RL' indicates the `Organise a reference list' section of the Guide; `RI' indicates \emph{Referencing images}.
+
+Some examples are highlighted in
+\tcbox[colframe=hacked,colback=hacked!5!white,nobeforeafter,size=fbox,tcbox raise base]{orange}.
+This indicates that some fields have been `abused' to achieve the right effect;
+in other words, they contain information that does not conform with their intended use.
+Some others make use of the \texttt{note} and \texttt{titleaddon} fields to achieve
+the right effect, where other styles might need the information placed differently.
+Particular care should be taken with such items when switching between different styles,
+though of course any item might need adjustment to take account of differing conventions.
+
+\subsection{Books and book chapters}
+
+\subsubsection*{Book with author(s)}
+
+\begin{bibexbox}<RX>{rang.etal2012rdp}
+  Rang, H.P., Dale, M.M., Ritter, J.M., Flower, R.J. and Henderson, G., 2012. \emph{Rang and Dale's pharmacology}. 7th ed. Edinburgh:\@ Elsevier Churchill Livingstone.
+  \tcblower
+\begin{Verbatim}
+@book{rang.etal2012rdp,
+  author = {Rang, H. P. and Dale, M. M. and Ritter, J. M. and Flower, R. J. and Henderson, G.},
+  year = {2012},
+  title = {Rang and {Dale's} Pharmacology},
+  edition = {7},
+  address = {Edinburgh},
+  publisher = {Elsevier Churchill Livingstone}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{bibexbox}<RX>{ou1972em}
+  Open University, 1972. \emph{Electricity and magnetism}. Bletchley:\@ Open University Press.
+  \tcblower
+\begin{Verbatim}
+@book{ou1972em,
+  author = {{Open University}},
+  year = {1972},
+  title = {Electricity and Magnetism},
+  address = {Bletchley},
+  publisher = {Open University Press}}
+\end{Verbatim}
+\end{bibexbox}
+
+\subsubsection*{Book with editor(s) instead of author(s)}
+
+\begin{bibexbox}<RX>{rothman.etal2008me}
+  Rothman, K.J., Greenland, S. and Lash, T.L., eds, 2008. \emph{Modern epidemiology}. 3rd ed. Philadelphia, Pa.:\@ Lippincott Williams \& Wilkins.
+  \tcblower
+\begin{Verbatim}
+@book{rothman.etal2008me,
+  editor = {Kenneth J. Rothman and Sander Greenland and Timothy L. Lash},
+  year = {2008},
+  title = {Modern Epidemiology},
+  edition = {3},
+  address = {Philadelphia, Pa.},
+  publisher = {Lippincott Williams \& Wilkins}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{info}\item
+Internally, \texttt{collection} is an alias for \texttt{book}.
+\end{info}
+
+\subsubsection*{Electronic book}
+
+\begin{bibexbox}<RX>{haynes2014crc}
+  Haynes, W.M., ed.\@, 2014. \emph{CRC handbook of chemistry and physics} [Online]. 94th ed. Boca Raton, Fla.:\@ CRC Press/Taylor and Francis. Available from:\@ \url{http://www.hbcpnetbase.com} [Accessed 16 June 2016].
+  \tcblower
+\begin{Verbatim}
+@book{haynes2014crc,
+  editor = {Haynes, W. M.},
+  year = {2014},
+  title = {{CRC} Handbook of Chemistry and Physics},
+  titleaddon = {[Online]},
+  edition = {94},
+  address = {Boca Raton, Fla.},
+  publisher = {CRC Press/Taylor and Francis},
+  url = {http://www.hbcpnetbase.com},
+  urldate = {16 June 2016}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{bibexbox}<RX>{hodds2016re}
+  Hodds, J., 2016. \emph{Referencing ebooks} [Kindle version 4.18]. Bath:\@ University of Bath.
+  \tcblower
+\begin{Verbatim}
+@book{hodds2016re,
+  author = {Hodds, J.},
+  year = {2016},
+  title = {Referencing ebooks},
+  titleaddon = {[Kindle version 4.18]},
+  address = {Bath},
+  publisher = {University of Bath}}
+\end{Verbatim}
+\end{bibexbox}
+
+\subsubsection*{Book known by its title}
+
+\begin{info}\item
+Unfortunately, to avoid breaking other use cases for the \texttt{book} entry
+type, to achieve the following format you must use the non-standard
+\texttt{reference} entry type.
+\end{info}
+
+\begin{bibexbox}<RX>{bnf2020}
+  British National Formulary, 2020. 79th ed. London: Pharmaceutical Press.
+  \tcblower
+\begin{Verbatim}
+@reference{bnf2020,
+  year = {2020},
+  title = {{British National Formulary}},
+  edition = {79},
+  address = {London},
+  publisher = {Pharmaceutical Press}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{info}\item
+Similarly, to achieve the following formats you must use the non-standard
+\texttt{inreference} entry type.
+\end{info}
+
+\begin{bibexbox}<RX>{asprin2020bnf}
+  British National Formulary, 2020. 79th ed. \emph{Asprin.} London: Pharmaceutical Press.
+  \tcblower
+\begin{Verbatim}
+@inreference{asprin2020bnf,
+  title = {Asprin},
+  year = {2020},
+  booktitle = {{British National Formulary}},
+  edition = {79},
+  address = {London},
+  publisher = {Pharmaceutical Press}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{bibexbox}<RX>{asprin2019bnf}
+  British National Formulary, 2019. \emph{Aspirin} [Online]. London: Pharmaceutical Press. Available from: \url{https://www.medicinescomplete.com/\#/content/bnf/_456850132} [Accessed 26 November 2019].
+  \tcblower
+\begin{Verbatim}
+@inreference{asprin2019bnf,
+  title = {Asprin},
+  year = {2019},
+  booktitle = {{British National Formulary \textup{[Online]}}},
+  address = {London},
+  publisher = {Pharmaceutical Press},
+  url = {https://www.medicinescomplete.com/\#/content/bnf/_456850132},
+  urldate = {26 November 2019}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{info}\item
+Internally, \texttt{inreference} is an alias for \texttt{incollection}.
+\end{info}
+
+\citet{bnf2020}, \cite{asprin2019bnf}, \citet{asprin2020bnf}.
+
+\subsubsection*{One chapter\slash paper from a collection (by different authors) in an edited book}
+
+\begin{bibexbox}<RL>{burchard1965hhl}
+  Burchard, J.E., 1965. How humanists use a library. In:\@ C.F.J. Overhage and J.R. Harman, eds. \emph{Intrex:\@ report on a planning conference and information transfer experiments}. Cambridge, Mass.:\@ MIT Press, pp.41--87.
+  \tcblower
+\begin{Verbatim}
+@incollection{burchard1965hhl,
+  author = {Burchard, J. E.},
+  year = {1965},
+  title = {How Humanists use a Library},
+  editor = {C. F. J. Overhage and J. R. Harman},
+  booktitle = {Intrex: report on a planning conference and information transfer experiments},
+  address = {Cambridge, Mass.},
+  publisher = {MIT Press},
+  pages = {41-87}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{bibexbox}<RX>{reid1967ptp}
+  Reid, D.R., 1967. Physical testing of polymer films. In:\@ S.H. Pinner, ed. \emph{Modern packaging films}. London:\@ Butterworths, pp.143--183.
+  \tcblower
+\begin{Verbatim}
+@incollection{reid1967ptp,
+  author = {D. R. Reid},
+  year = {1967},
+  title = {Physical Testing of Polymer Films},
+  editor = {S. H. Pinner},
+  booktitle = {Modern Packaging Films},
+  address = {London},
+  publisher = {Butterworths},
+  pages = {143-183}}
+\end{Verbatim}
+\end{bibexbox}
+
+\subsection{Articles and periodicals}
+
+\subsubsection*{Journal article}
+
+\begin{bibexbox}<RL>{stieg1981cer}
+  Stieg, M.F., 1981a. Continuing education and the reference librarian in the academic and research library. \emph{Library journal}, 105(22), pp.2547--2551.
+  \tcblower
+\begin{Verbatim}
+@article{stieg1981cer,
+  author = {Stieg, M. F.},
+  year = {1981},
+  title = {Continuing Education and the Reference Librarian in the Academic and Research Library},
+  journal = {Library Journal},
+  volume = {105},
+  number ={22},
+  pages = {2547-2551}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{bibexbox}<RL>{stieg1981inh}
+  Stieg, M.F., 1981b. The information needs of historians. \emph{College and research libraries}, 42(6), pp.549--560.
+  \tcblower
+\begin{Verbatim}
+@article{stieg1981inh,
+  author = {Stieg, M. F.},
+  year = {1981},
+  title = {The Information Needs of Historians},
+  journal = {College and Research Libraries},
+  volume = {42},
+  number ={6},
+  pages = {549-560}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{bibexbox}<RX>{newman2010mcb}
+  Newman, R., 2010. Malaria control beyond 2010. \emph{Brit.\@ Med.\@ J.}, 341(7765), pp.157--208.
+  \tcblower
+\begin{Verbatim}
+@article{newman2010mcb,
+  author = {Newman, R.},
+  year = {2010},
+  title = {Malaria control beyond 2010},
+  journal = {{Brit.\@ Med.\@ J.}},
+  volume = {341},
+  number = {7765},
+  pages = {157-208}}
+\end{Verbatim}
+\end{bibexbox}
+
+\subsubsection*{Electronic journal article}
+
+\begin{bibexbox}<RX>{williams1997edd}
+  Williams, F., 1997. Electronic document delivery:\@ a trial in an academic library. \emph{Ariadne} [Online], 10. Available from:\@ \url{http://www.ariadne.ac.uk/issue10/edd/} [Accessed 5 December 1997].
+  \tcblower
+\begin{Verbatim}
+@article{williams1997edd,
+  author = {Williams, F.},
+  year = {1997},
+  title = {Electronic Document Delivery: a Trial in an Academic Library},
+  journal = {Ariadne \textup{[Online]}},
+  volume = {10},
+  url = {http://www.ariadne.ac.uk/issue10/edd/},
+  urldate = {5 December 1997}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{hacks}
+\item With most styles, you would put `in press' or `preprint' as the
+  \texttt{year} for articles that have yet to be officially published, but for
+  this style you need to put it in \texttt{volume}. If you would rather lose
+  this information when switching to a different style than have it incorrectly
+  placed, you can use the \texttt{pubstate} field from \textsf{biblatex}
+  instead. Use the keyword \texttt{inpress} for `in press' and
+  \texttt{inpreparation} or \texttt{submitted} (whichever is more accurate) for
+  `preprint'.
+
+\begin{tcolorbox}%
+  [ colframe = Slate
+  , colback = white
+  , fontupper = \footnotesize
+  ]
+  \begin{Verbatim}
+  pubstate = {inpress},
+  \end{Verbatim}
+\end{tcolorbox}
+\end{hacks}
+
+\begin{bibexbox}(hacked)<RX>{liontou.etal2019dra}
+  Liontou, C., Kontopodis, E., Oikonomidis, N., Maniotis, C., Tassopoulos, A., Tsiafoutis, I., Lazaris, E. and Koutouzis, M., 2019. Distal radial access:\@ a review article. \emph{Cardiovascular revascularization medicine} [Online], in press. Available from: \url{https://www.sciencedirect.com/science/article/pii/S1553838919303367} [Accessed 19 June 2019].
+  \tcblower
+\begin{Verbatim}
+@article{liontou.etal2019dra,
+  author = {Liontou, C. and Kontopodis, E. and Oikonomidis, N. and Maniotis, C. and
+    Tassopoulos, A. and Tsiafoutis, I. and Lazaris, E. and Koutouzis, M.},
+  year = {2019},
+  title = {Distal Radial Access: a Review Article},
+  journal = {Cardiovascular revascularization medicine \textup{[Online]}},
+  volume = {in press},
+  url = {https://www.sciencedirect.com/science/article/pii/S1553838919303367},
+  urldate = {19 June 2019}}
+\end{Verbatim}
+\end{bibexbox}
+
+\subsubsection*{Preprint in a digital repository}
+
+\begin{tips}
+\item
+The Harvard (Bath) style gives you a choice whether to treat preprints as
+pre-publication articles (above) or as grey literature (below). In the latter
+case, the \texttt{techreport} entry type is the best match semantically.
+\end{tips}
+
+\begin{bibexbox}<RX>{shah.corrick2016hsc}
+  Shah, I. and Corrick, I., 2016. \emph{How should central banks respond to non-neutral inflation expectations?} Bath:\@ University of Bath. \emph{OPUS} [Online]. Available from:\@ \url{http://opus.bath.ac.uk} [Accessed 4 May 2016].
+  \tcblower
+\begin{Verbatim}
+@techreport{shah.corrick2016hsc,
+  author = {Shah, I. and Corrick, I.},
+  year = {2016},
+  title = {How should central banks respond to non-neutral inflation expectations?},
+  address = {Bath},
+  institution = {University of Bath},
+  note = {\emph{OPUS} [Online]},
+  url = {http://opus.bath.ac.uk},
+  urldate = {4 May 2016}}
+\end{Verbatim}
+\end{bibexbox}
+
+\subsubsection*{Newspaper article}
+
+\begin{hacks}\item Give the issue's day and month as the \texttt{volume}.\end{hacks}
+
+\begin{bibexbox}(hacked)<RX>{haurant2004bbh}
+  Haurant, S., 2004. Britain's borrowing hits £1 trillion. \emph{The Guardian}, 29 July, p.16c.
+  \tcblower
+\begin{Verbatim}
+@article{haurant2004bbh,
+  author = {Haurant, S.},
+  year = {2004},
+  title = {Britain's Borrowing Hits \pounds 1 Trillion},
+  journal = {The {Guardian}},
+  volume = {29 July},
+  pages = {16c}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{bibexbox}(hacked)<RX>{independent1992pub}
+  The Independent, 1992. Picking up the bills. \emph{The Independent}, 4 June, p.28a.
+  \tcblower
+\begin{Verbatim}
+@article{independent1992pub,
+  author = {{The Independent}},
+  year = {1992},
+  title = {Picking Up the Bills},
+  journal = {The {Independent}},
+  volume = {4 June},
+  pages = {28a}}
+\end{Verbatim}
+\end{bibexbox}
+
+\subsection{Conference papers}
+
+\begin{info}\item
+As in the standard Bib\TeX\ styles, \texttt{conference} is a legacy (and highly deprecated) alias for \texttt{inproceedings}.
+\end{info}
+
+\subsubsection*{Conference paper (when proceedings have a named editor)}
+
+\begin{bibexbox}<RX>{crawford1965oim}
+  Crawford, G.I., 1965. Oxygen in metals. In:\@ J.M.A. Lenihan and S.J. Thompson, eds. \emph{Activation analysis:\@ proceedings of a NATO Advanced Study Institute}, 2--4 August 1964, Glasgow. London:\@ Academic Press, pp.113--118.
+  \tcblower
+\begin{Verbatim}
+@inproceedings{crawford1965oim,
+  author = {Crawford, G. I.},
+  year = {1965},
+  title = {Oxygen in Metals},
+  editor = {J. M. A. Lenihan and S. J. Thompson},
+  booktitle = {Activation Analysis: Proceedings of a {NATO} {Advanced} {Study} {Institute}},
+  venue = {2--4 August 1964, Glasgow},
+  address = {London},
+  publisher = {Academic Press},
+  pages = {113-118}}
+\end{Verbatim}
+\end{bibexbox}
+
+\subsubsection*{Conference paper (when proceedings have no named editor or are part of a major series)}
+
+\begin{bibexbox}<RX>{soper1972rbc}
+  Soper, D., 1972. Review of bracken control experiments with asulam. \emph{Proceedings of the 11th British Weed Control Conference}, 15--17 November 1972, Brighton. Brighton:\@ University of Sussex, pp.24--31.
+  \tcblower
+\begin{Verbatim}
+@inproceedings{soper1972rbc,
+  author = {Soper, D.},
+  year = {1972},
+  title = {Review of Bracken Control Experiments with Asulam},
+  booktitle = {Proceedings of the 11th {British} {Weed} {Control} {Conference}},
+  venue = {15--17 November 1972, Brighton},
+  address = {Brighton},
+  publisher = {University of Sussex},
+  pages = {24-31}}
+\end{Verbatim}
+\end{bibexbox}
+
+\subsection{Grey literature}
+
+\subsubsection*{Thesis/dissertation}
+
+\begin{bibexbox}<RX>{burrell1973ist}
+  Burrell, J.G., 1973. \emph{The importance of school tours in education}. Thesis (M.A.). Queen's University, Belfast.
+  \tcblower
+\begin{Verbatim}
+@mastersthesis{burrell1973ist,
+  author = {Burrell, J. G.},
+  year = {1973},
+  title = {The Importance of School Tours in Education},
+  type = {Thesis ({M.A.})},
+  school = {Queen's University, Belfast}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{info}\item Internally, \texttt{thesis} is an alias for \texttt{phdthesis}.\end{info}
+
+\subsubsection*{Report}
+
+\begin{bibexbox}<RX>{unesco1993gip}
+  UNESCO, 1993. \emph{General information programme and UNISIST}\@. (PGI-93/WS/22). Paris:\@ UNESCO.
+  \tcblower
+\begin{Verbatim}
+@techreport{unesco1993gip,
+  author = {{UNESCO}},
+  year = {1993},
+  title = {General Information Programme and {UNISIST}},
+  address = {Paris},
+  institution = {UNESCO},
+  number = {PGI-93/WS/22}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{bibexbox}<RX>{bre2007dqb}
+  BRE, 2007. \emph{Designing quality buildings:\@ a BRE guide}. (Report 497). Bracknell:\@ BRE.
+  \tcblower
+\begin{Verbatim}
+@techreport{bre2007dqb,
+  author = {{BRE}},
+  year = {2007},
+  title = {Designing Quality Buildings: a {BRE} Guide},
+  address = {Bracknell},
+  institution = {BRE},
+  type = {Report},
+  number = {497}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{info}\item Internally, \texttt{report} is an alias for \texttt{techreport}.\end{info}
+
+\subsubsection*{Standard}
+
+\begin{bibexbox}<RX>{bs5605:1990}
+  BSI, 1990. \emph{BS 5605:1990 Recommendations for citing and referencing
+  published material.} London: BSI.
+  \tcblower
+\begin{Verbatim}
+@manual{bs5605:1990,
+  author = {{BSI}},
+  year = {1990},
+  title = {{BS}~5605:1990 {Recommendations} for Citing and Referencing Published Material},
+  address = {London},
+  organization = {BSI}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{bibexbox}<RX>{astm.d1655}
+  ASTM, 2019. \emph{ASTM D1655 - 19 Standard specification for aviation
+  turbine fuels.} West Conshohocken, Pa.: ASTM.
+  \tcblower
+\begin{Verbatim}
+@manual{astm.d1655,
+  author = {{ASTM}},
+  year = {2019},
+  title = {{ASTM~D1655} - 19 {Standard} Specification for Aviation Turbine Fuels},
+  address = {West Conshohocken, Pa.},
+  organization = {ASTM}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{info}\item Internally, \texttt{standard} is an alias for \texttt{manual}.\end{info}
+
+\subsubsection*{Patent}
+
+\begin{bibexbox}<RX>{pm1981opa}
+  Phillipp Morris Inc., 1981. \emph{Optical perforating apparatus and system}. European patent application 0021165A1. 1981-01-07.
+  \tcblower
+\begin{Verbatim}
+@manual{pm1981opa,
+  author = {{Phillipp Morris Inc.}},
+  year = {1981},
+  title = {Optical perforating apparatus and system},
+  series = {European patent application},
+  number = {0021165A1. 1981-01-07}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{info}\item Internally, \texttt{patent} is an alias for \texttt{manual}.\end{info}
+
+\subsubsection*{Unpublished written material and personal communications}
+
+\begin{bibexbox}<RX>{harris2013fgr}
+  Harris, G., 2013. \emph{Focus group recommendations:\@ internal task group
+  report}. Unpublished.
+  \tcblower
+\begin{Verbatim}
+@unpublished{harris2013fgr,
+  author = {Harris, G.},
+  year = {2013},
+  title = {Focus group recommendations: internal task group report}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{bibexbox}<RX>{hadley2015bir}
+  Hadley, S., 2015. \emph{Biomechanics:\@ introductory reading, BM289:\@ sport
+  biomechanics}. University of Bath. Unpublished.
+  \tcblower
+\begin{Verbatim}
+@unpublished{hadley2015bir,
+  author = {Hadley, S.},
+  year = {2015},
+  title = {Biomechanics: introductory reading, {BM289}: sport biomechanics},
+  howpublished = {University of Bath}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{bibexbox}<RX>{thomas2015wcr}
+  Thomas, D., 2015. Word count and referencing style. \emph{Frequently
+  asked questions discussion board:\@ PHYS 2011:\@ housing studies.}
+  University of Bath. Unpublished.
+  \tcblower
+\begin{Verbatim}
+@unpublished{thomas2015wcr,
+  author = {Thomas, D.},
+  year = {2015},
+  title = {Word count and referencing style},
+  booktitle = {Frequently asked questions discussion board: {PHYS} 2011: housing studies},
+  howpublished = {University of Bath}}
+\end{Verbatim}
+\end{bibexbox}
+
+\subsection{Audiovisual materials}
+
+\subsubsection*{Image}
+
+\begin{tips}\item You would normally class images as \texttt{misc} or \texttt{unpublished}, but those entry types have particular formatting quirks in this style that don't work for images. Use \texttt{manual} or \texttt{booklet} instead. You can use \texttt{online} (an alias for \texttt{manual}) for online images.\end{tips}
+
+\begin{bibexbox}<RI>{nasa2015nat}
+   NASA, 2015, \emph{NASA astronaut Tim Kopra on Dec.\@ 21 spacewalk} [Online]. Washington:\@ NASA. Available from:\@ \url{http://www.nasa.gov/image-feature/nasa-astronaut-tim-kopra-on-dec-21-spacewalk} [Accessed 7 January 2015].
+  \tcblower
+\begin{Verbatim}
+@manual{nasa2015nat,
+  author = {{NASA}},
+  year = {2015},
+  title = {{NASA} Astronaut {Tim} {Kopra} on {Dec.\@} 21 Spacewalk},
+  titleaddon = {[Online]},
+  address = {Washington},
+  organization = {NASA},
+  url = {http://www.nasa.gov/image-feature/nasa-astronaut-tim-kopra-on-dec-21-spacewalk},
+  urldate = {7 January 2015}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{tips}\item You can use either the \texttt{publisher} or the \texttt{organization} field to
+record the source of the image.\end{tips}
+
+\begin{bibexbox}<RI>{iliff2006rcb}
+   Iliff, D., 2006. \emph{Royal Crescent in Bath, England - July 2006} [Online]. San Francisco:\@ Wikimedia Foundation. Available from:\@ \url{https://commons.wikimedia.org/wiki/File:Royal_Crescent_in_Bath,_England_-_July_2006.jpg} [Accessed 7 January 2016].
+  \tcblower
+\begin{Verbatim}
+@manual{iliff2006rcb,
+  author = {D. Iliff},
+  year = {2006},
+  title = {{Royal} {Crescent} in {Bath,} {England} - {July} 2006},
+  titleaddon = {[Online]},
+  address = {San Francisco},
+  organization = {Wikimedia Foundation},
+  url = {https://commons.wikimedia.org/wiki/File:Royal_Crescent_in_Bath,_England_-_July_2006.jpg},
+  urldate = {7 January 2016}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{bibexbox}<RI>{anon1946peb}
+  Anon., 1946. \emph{Prototype electric bicycle displayed at the \enquote{Britain Can Make It} exhibition organised by the Council of Industrial Design and held at the Victoria and Albert Museum, London, 1946. Designed by B.~G. Bowden} [Photograph]. At:\@ London. Design Council Slide Collection.
+  \tcblower
+\begin{Verbatim}
+@manual{anon1946peb,
+  author = {Anon.},
+  year = {1946},
+  title = {Prototype electric bicycle displayed at the \enquote{Britain Can Make It} exhibition
+    organised by the {Council} of {Industrial} {Design} and held at the {Victoria} and {Albert}
+    {Museum}, {London}, 1946. {Designed} by {B.~G.} {Bowden}},
+  titleaddon = {[Photograph]},
+  note = {At: London. Design Council Slide Collection}}
+\end{Verbatim}
+\end{bibexbox}
+
+
+\subsubsection*{Map}
+
+\begin{bibexbox}<RX>{andrews.dury1773wilts}
+  Andrews, J. and Dury, A., 1773. \emph{Map of Wiltshire}, 1 inch to 2 miles. Devizes:\@ Wiltshire Record Society.
+  \tcblower
+\begin{Verbatim}
+@manual{andrews.dury1773wilts,
+  author = {Andrews, J. and Dury, A.},
+  year = {1773},
+  title = {Map of {Wiltshire}},
+  series = {1 inch to 2 miles},
+  address = {Devizes},
+  publisher = {Wiltshire Record Society}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{tips}\item The \texttt{book} entry type would also work for this reference.\end{tips}
+
+\begin{bibexbox}<RX>{os2020bath}
+  Ordnance Survey, 2020. \emph{Street view map of University of Bath} [Online], 1:5000, OS VectorMap® Local. Available from: \url{https://digimap.edina.ac.uk/roam/map/os} [Accessed 30 April 2020].
+  \tcblower
+\begin{Verbatim}
+@manual{os2020bath,
+  author = {{Ordnance Survey}},
+  year = {2020},
+  title = {Street view map of {University of Bath}},
+  series = {1:5000, OS VectorMap® Local},
+  url = {https://digimap.edina.ac.uk/roam/map/os},
+  urlyear = {30 April 2020}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{bibexbox}<RX>{google2020harbourside}
+  Google, 2020. \emph{Harbourside, Bristol} [Online], Google Maps. Available from: \url{https://www.google.co.uk/maps/place/Harbourside,+Bristol/} [Accessed 30 April 2020].
+  \tcblower
+\begin{Verbatim}
+@manual{google2020harbourside,
+  author = {{Google}},
+  year = {2020},
+  title = {{Harbourside, Bristol}},
+  series = {Google Maps},
+  url = {https://www.google.co.uk/maps/place/Harbourside,+Bristol/},
+  urldate = {2020-04-30}}
+\end{Verbatim}
+\end{bibexbox}
+
+\subsubsection*{Film, video or DVD}
+
+\begin{bibexbox}<RX>{macbeth1948}
+  \emph{Macbeth}, 1948. Film.\@ Directed by Orson Welles. USA:\@ Republic Pictures.
+  \tcblower
+\begin{Verbatim}
+@booklet{macbeth1948,
+  year = {1948},
+  title = {Macbeth},
+  howpublished = {Film. Directed by Orson Welles},
+  address = {USA},
+  publisher = {Republic Pictures}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{info}\item Internally, \texttt{movie} and \texttt{video} are aliases for \texttt{booklet}.\end{info}
+
+\subsubsection*{Streamed video (YouTube, TED Talks, etc.)}
+
+\begin{bibexbox}<RX>{moran2016sol}
+  Moran, C., 2016. \emph{Save our libraries} [Online]. Available from:\@ \url{https://www.youtube.com/watch?v=gKTfCz4JtVE&feature=youtu.be} [Accessed 29 April 2016].
+  \tcblower
+\begin{Verbatim}
+@manual{moran2016sol,
+  author = {Moran, C.},
+  year = {2016},
+  title = {Save Our Libraries},
+  titleaddon = {[Online]},
+  url = {https://www.youtube.com/watch?v=gKTfCz4JtVE&feature=youtu.be},
+  urldate = {29 April 2016}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{bibexbox}<RI>{uob2015wie}
+   University of Bath, 2015. \emph{What is engineering?} [Online]. Available from:\@ \url{https://www.youtube.com/watch?v=NoyZarq-Zbo} [Accessed 12 January 2016].
+  \tcblower
+\begin{Verbatim}
+@manual{uob2015wie,
+  author = {{University of Bath}},
+  year = {2015},
+  title = {What is Engineering?},
+  titleaddon = {[Online]},
+  url = {https://www.youtube.com/watch?v=NoyZarq-Zbo},
+  urldate = {12 January 2016}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{bibexbox}<RI>{chakrabarti2016hac}
+   Chakrabarti, V., 2016. \emph{How architecture and city planning can combat social inequality} [Online]. Available from:\@ \url{https://www.curbed.com/2016/5/5/11593058/vishaan-chakrabarti-pau-curbed-appeal-podcast} [Accessed 28 March 2019].
+  \tcblower
+\begin{Verbatim}
+@manual{chakrabarti2016hac,
+  author = {Chakrabarti, V.},
+  year = {2016},
+  title = {How Architecture and City Planning Can Combat Social Inequality},
+  titleaddon = {[Online]},
+  url = {https://www.curbed.com/2016/5/5/11593058/vishaan-chakrabarti-pau-curbed-appeal-podcast},
+  urlyear = {28 March 2019}}
+\end{Verbatim}
+\end{bibexbox}
+
+\subsubsection*{Television or radio broadcast}
+
+\begin{bibexbox}<RX>{rsfo2006ep5}
+  \emph{Rick Stein's French odyssey:\@ Episode 5}, 2006. TV. BBC2, 23 August. 20.30 hrs.
+  \tcblower
+\begin{Verbatim}
+@booklet{rsfo2006ep5,
+  year = {2006},
+  title = {Rick {Stein's} {French} Odyssey: Episode 5},
+  howpublished = {TV. BBC2, 23 August. 20.30 hrs}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{bibexbox}<RX>{archers20060823}
+  \emph{The Archers}, 2006. Radio. BBC Radio 4, 23 August. 19.02 hrs.
+  \tcblower
+\begin{Verbatim}
+@booklet{archers20060823,
+  year = {2006},
+  title = {The {Archers}},
+  howpublished = {Radio. BBC Radio 4, 23 August. 19.02 hrs}}
+\end{Verbatim}
+\end{bibexbox}
+
+
+\begin{info}\item Internally, \texttt{audio} and \texttt{music} are aliases for \texttt{booklet}.\end{info}
+
+\subsubsection*{Music score}
+
+\begin{bibexbox}<RX>{beethoven1950symph1}
+  Beethoven, L. van, 1950. \emph{Symphony no.1 in C, Op.21}. Harmondsworth:\@ Penguin.
+  \tcblower
+\begin{Verbatim}
+@book{beethoven1950symph1,
+  author = {Ludwig van Beethoven},
+  year = {1950},
+  title = {Symphony no.1 in {C,} {Op.21}},
+  address = {Harmondsworth},
+  publisher = {Penguin}}
+\end{Verbatim}
+\end{bibexbox}
+
+\subsection{Digital media}
+
+\subsubsection*{Website\slash webpage}
+
+While it is normal when using Bib\TeX\ to use \texttt{misc} for websites,
+with this style you should use \texttt{online} (or \texttt{electronic} or \texttt{www}) instead.
+Internally these are all aliases for \texttt{manual}.
+
+\begin{bibexbox}<RX>{holland2002gci}
+  Holland, M., 2002. \emph{Guide to citing internet sources} [Online]. Poole:\@ Bournemouth University. Available from:\@ \url{http://www.bournemouth.ac.uk/library/using/guide_to_citing_internet_sourc.html} [Accessed 4 November 2002].
+  \tcblower
+\begin{Verbatim}
+@manual{holland2002gci,
+  author = {Holland, M.},
+  year = {2002},
+  title = {Guide to Citing Internet Sources},
+  titleaddon = {[Online]},
+  address = {Poole},
+  organization = {Bournemouth University},
+  url = {http://www.bournemouth.ac.uk/library/using/guide_to_citing_internet_sourc.html},
+  urldate = {4 November 2002}}
+\end{Verbatim}
+\end{bibexbox}
+
+\subsubsection*{Email discussion lists (jiscmail\slash listserv etc.)}
+
+\begin{bibexbox}(hacked)<RX>{clark2004euk}
+  Clark, T., 5 July 2004. A European UK Libraries Plus? \emph{Lis-link} [Online]. Available from:\@ \url{lis-link@jiscmail.ac.uk} [Accessed 30 July 2004].
+  \tcblower
+\begin{Verbatim}
+@article{clark2004euk,
+  author = {Clark, T.},
+  year = {5 July 2004},
+  title = {A {European} {UK} {Libraries} {Plus}?},
+  journal = {Lis-link \textup{[Online]}},
+  url = {lis-link@jiscmail.ac.uk},
+  urldate = {30 July 2004}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{tips}
+\item Use the \texttt{journal} field to specify the mailing list.
+\end{tips}
+
+\begin{hacks}
+\item You will need to put the full date in the \texttt{year} field;
+unfortunately this means you have to put in extra work to show only the year in citations:
+\end{hacks}
+
+\begin{tcblisting}{listing side text, lefthand width=.5\linewidth}
+\citetext{\citeauthor[2004]{clark2004euk}}
+\end{tcblisting}
+
+\subsubsection*{Database}
+
+\begin{bibexbox}<RX>{bvd2008bt}
+  Bureau van Dijk, 2008. \emph{BT Group plc company report}. \emph{FAME} [Online]. London:\@ Bureau van Dijk. Available from:\@ \url{http://www.portal.euromonitor.com} [Accessed 6 November 2014].
+  \tcblower
+\begin{Verbatim}
+@manual{bvd2008bt,
+  author = {{Bureau van Dijk}},
+  year = {2008},
+  title = {{BT} {Group} PLC Company Report},
+  series = {\emph{FAME} [Online]},
+  address = {London},
+  organization = {Bureau van Dijk},
+  url = {http://www.portal.euromonitor.com},
+  urldate = {6 November 2014}}
+\end{Verbatim}
+\end{bibexbox}
+
+\subsubsection*{Dataset}
+
+\begin{bibexbox}<RX>{wilson2013rgc}
+  Wilson, D., 2013. \emph{Real geometry and connectedness via triangular description:\@ CAD example bank} [Online]. Bath:\@ University of Bath. Available from:\@ \url{https://doi.org/10.15125/BATH-00069} [Accessed 20 April 2016].
+  \tcblower
+\begin{Verbatim}
+@manual{wilson2013rgc,
+  author = {Wilson, D.},
+  year = {2013},
+  title = {Real Geometry and Connectedness via Triangular Description: {CAD} Example Bank},
+  titleaddon = {[Online]},
+  address = {Bath},
+  organization = {University of Bath},
+  doi = {10.15125/BATH-00069},
+  urldate = {20 April 2016}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{info}\item You can use \texttt{dataset} instead of \texttt{online} as an alias for \texttt{manual}.\end{info}
+
+\subsubsection*{Computer program}
+
+\begin{bibexbox}<RX>{screencasto}
+  @screencasto, n.d. \emph{Screencast-O-Matic} (v.2) [computer program]. Available from:\@ \url{https://screencast-o-matic.com/} [Accessed 16 May 2016].
+  \tcblower
+\begin{Verbatim}
+@manual{screencasto,
+  author = {@screencasto},
+  year = {n.d.},
+  title = {{Screencast-O-Matic}},
+  titleaddon = {(v.2) [computer program]},
+  url = {https://screencast-o-matic.com/},
+  urldate = {16 May 2016}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{info}\item Internally, \texttt{software} is an alias for \texttt{manual}.\end{info}
+
+\subsection{Works in languages other than English}
+
+\subsubsection*{Work in translation}
+
+\begin{bibexbox}<RX>{aristotle2007ne}
+  Aristotle, 2007. \emph{Nicomachean ethics} (W.D. Ross, Trans.). South Dakota:\@ NuVisions.
+  \tcblower
+\begin{Verbatim}
+@book{aristotle2007ne,
+  author = {Aristotle},
+  year = {2007},
+  title = {Nicomachean Ethics},
+  titleaddon = {(W.D. Ross, Trans.)},
+  address = {South Dakota},
+  publisher = {NuVisions}}
+\end{Verbatim}
+\end{bibexbox}
+
+\subsubsection*{Work in the Roman alphabet}
+
+\begin{bibexbox}<RX>{esquivel2003cap}
+  Esquivel, L., 2003. \emph{Como agua para chocolate} [Like water for chocolate]. Barcelona:\@ Debolsillo.
+  \tcblower
+\begin{Verbatim}
+@book{esquivel2003cap,
+  author = {Esquivel, L.},
+  year = {2003},
+  title = {Como Agua para Chocolate},
+  titleaddon = {[Like water for chocolate]},
+  address = {Barcelona},
+  publisher = {Debolsillo}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{bibexbox}<RX>{thurfjell1975vhv}
+  Thurfjell, W., 1975. Vart har våran doktor tagit vägen? [Where has our doctor gone?]. \emph{Läkartidningen}, 72, p.789.
+  \tcblower
+\begin{Verbatim}
+@article{thurfjell1975vhv,
+  author = {Thurfjell, W.},
+  year = {1975},
+  title = {Vart har våran doktor tagit vägen?},
+  titleaddon = {[Where has our doctor gone?]},
+  journal = {Läkartidningen},
+  volume = {72},
+  pages = {789}}
+\end{Verbatim}
+\end{bibexbox}
+
+\subsubsection*{Work in a non-Roman alphabet}
+
+\begin{tips}
+\item
+The following example tricks Bib\TeX\ into treating the original rendering of the author's name as the `von' part of a Roman-alphabet name. This requires the use of a command that simply gobbles its argument, which you have to define yourself:
+
+\begin{tcblisting}{listing only}
+\newcommand*{\noop}[1]{}
+\end{tcblisting}
+
+For the trick to work, the argument you give to \lstinline[style=dtxlatex]|\noop| must be lowercase, but otherwise it can be anything you like.
+\end{tips}
+
+\newcommand*{\noop}[1]{}
+\begin{bibexbox}(hacked)<RX>{hua1999qys1}
+  Hua, L. 華林甫, 1999.  Qingdai yilai Sanxia diqu shuihan zaihai de chubu yanjiu 清代以來三峽地區水旱災害的初步硏 [A preliminary study of floods and droughts in the Three Gorges region since the Qing dynasty]. \emph{Zhongguo shehui kexue} 中國社會科學, 1, pp.168--79.
+  \tcblower
+\begin{Verbatim}
+@article{hua1999qys1,
+  author = {Linfu \noop{h}華林甫 Hua},
+  year = {1999},
+  title = {Qingdai yilai {Sanxia} diqu shuihan zaihai de chubu yanjiu
+    {清代以來三峽地區水旱災害的初步硏}},
+  titleaddon = {[A preliminary study of floods and droughts in the {Three} {Gorges} region since
+    the {Qing} dynasty]},
+  journal = {Zhongguo shehui kexue \textup{中國社會科學}},
+  volume = {1},
+  pages = {168-79}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{tips}
+\item If the name is due to appear initial first (e.g.\ after `In:'), you can append the non-Roman characters to the author's surname; to do this, use inverted name order as you would for English double-barrelled names without hyphens, e.g.\ \texttt{Hua 華林甫, Linfu}.
+\end{tips}
+
+\begin{bibexbox}<RX>{hua1999qys2}
+  Hua, L., 1999. Qingdai yilai Sanxia diqu shuihan zaihai de chubu yanjiu [A preliminary study of floods and droughts in the Three Gorges region since the Qing dynasty]. \emph{Zhongguo shehui kexue}, 1, pp.168--79.
+  \tcblower
+\begin{Verbatim}
+@article{hua1999qys2,
+  author = {Hua, Linfu},
+  year = {1999},
+  title = {Qingdai yilai {Sanxia} diqu shuihan zaihai de chubu yanjiu},
+  titleaddon = {[A preliminary study of floods and droughts in the {Three} {Gorges} region since
+    the {Qing} dynasty]},
+  journal = {Zhongguo shehui kexue},
+  volume = {1},
+  pages = {168-79}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{bibexbox}<RX>{pamporov2006rvb}
+  Pamporov, A., 2006. \emph{Romskoto vsekidnevie v Balgariya} [Roma everyday life in Bulgaria]. Veliko Tarnovo: Faber.
+  \tcblower
+\begin{Verbatim}
+@book{pamporov2006rvb,
+  author = {Pamporov, A.},
+  year = {2006},
+  title = {Romskoto vsekidnevie v {Balgariya}},
+  titleaddon = {[Roma everyday life in Bulgaria]},
+  address = {Veliko Tarnovo},
+  publisher = {Faber}}
+\end{Verbatim}
+\end{bibexbox}
+
+\subsection{Legal references: UK legislation and parliamentary reports}
+
+
+\subsubsection*{Act of Parliament (UK Statutes) before 1963}
+
+\begin{bibexbox}<RX>{gb.wa1735}
+  \emph{Witchcraft Act 1735} (9 Geo.2, c.5).
+  \tcblower
+\begin{Verbatim}
+@book{gb.wa1735,
+  key = {Witchcraft Act 1735},
+  title = {Witchcraft {Act} 1735},
+  titleaddon = {(9 Geo.2, c.5)}}
+\end{Verbatim}
+\end{bibexbox}
+
+\subsubsection*{Act of Parliament (UK Statutes) 1963 onwards}
+
+\begin{bibexbox}<RX>{gb.pa2014}
+  \emph{Pensions Act 2014}, c.19. London:\@ TSO.
+  \tcblower
+\begin{Verbatim}
+@book{gb.pa2014,
+  key = {Pensions Act 2014},
+  title = {Pensions {Act} 2014},
+  number = {c.19},
+  address = {London},
+  publisher = {TSO}}
+\end{Verbatim}
+\end{bibexbox}
+
+\subsubsection*{House of Commons/House of Lords bill}
+
+\begin{bibexbox}<RX>{gb.bill1987/88-66}
+  Great Britain.\@ Parliament.\@ House of Commons, 1988. \emph{Local government finance bill}. (Bills | 1987/88, 66). London:\@ HMSO.
+  \tcblower
+\begin{Verbatim}
+@techreport{gb.bill1987/88-66,
+  author = {{Great Britain. Parliament. House of Commons}},
+  year = {1988},
+  title = {Local Government Finance Bill},
+  address = {London},
+  publisher = {HMSO},
+  type = {{Bills |}},
+  number = {1987/88, 66}}
+\end{Verbatim}
+\end{bibexbox}
+
+
+\subsubsection*{Statutory instrument}
+
+\begin{bibexbox}<RX>{gb.hmr2012}
+  \emph{The Human Medicines Regulations 2012} [Online], No.1916, United Kingdom:\@ HMSO. Available from:\@ \url{http://www.legislation.gov.uk/uksi/2012/1916/pdfs/uksi_20121916_en.pdf} [Accessed 17 April 2016].
+  \tcblower
+\begin{Verbatim}
+@book{gb.hmr2012,
+  title = {The {Human} {Medicines} {Regulations} 2012},
+  titleaddon = {[Online]},
+  number = {No.1916},
+  address = {United Kingdom},
+  publisher = {HMSO},
+  url = {http://www.legislation.gov.uk/uksi/2012/1916/pdfs/uksi_20121916_en.pdf},
+  urldate = {17 April 2016}}
+\end{Verbatim}
+\end{bibexbox}
+
+
+
+\subsubsection*{House of Commons paper}
+
+Use this form for reports of House of Commons select committees.
+
+\begin{bibexbox}<RX>{gb.hc2003/04-30}
+  Great Britain.\@ Parliament.\@ House of Commons, 2004. \emph{National Savings investment deposits:\@ account 2002--2003}. (HC 2003/04, 30). London:\@ National Audit Office.
+  \tcblower
+\begin{Verbatim}
+@techreport{gb.hc2003/04-30,
+  author = {{Great Britain. Parliament. House of Commons}},
+  year = {2004},
+  title = {National {Savings} Investment Deposits: account 2002--2003},
+  address = {London},
+  publisher = {National Audit Office},
+  type = {{HC}},
+  number = {2003/04, 30}}
+\end{Verbatim}
+\end{bibexbox}
+
+\subsubsection*{House of Lords paper}
+
+Use this form for reports of House of Lords select committees.
+
+\begin{bibexbox}<RX>{gb.hl1986/87-66}
+  Great Britain.\@ Parliament.\@ House of Lords, 1987. \emph{Social fund (maternity and funeral expenses) bill}. (HL 1986/87, (66)). London:\@ HMSO.
+  \tcblower
+\begin{Verbatim}
+@techreport{gb.hl1986/87-66,
+  author = {{Great Britain. Parliament. House of Lords}},
+  year = {1987},
+  title = {Social Fund (Maternity and Funeral Expenses) Bill},
+  address = {London},
+  publisher = {HMSO},
+  type = {{HL}},
+  number = {1986/87, (66)}}
+\end{Verbatim}
+\end{bibexbox}
+
+
+\subsubsection*{Command paper}
+
+\begin{bibexbox}<RX>{gb.cm6041}
+  Great Britain.\@ Ministry of Defence, 2004. \emph{Delivering security in a changing world:\@ defence white paper}. (Cm.\@ 6041). London:\@ TSO.
+  \tcblower
+\begin{Verbatim}
+@techreport{gb.cm6041,
+  author = {{Great Britain. Ministry of Defence}},
+  year = {2004},
+  title = {Delivering Security in a Changing World{:} Defence White Paper},
+  address = {London},
+  publisher = {TSO},
+  type = {{Cm.}},
+  number = {6041}}
+\end{Verbatim}
+\end{bibexbox}
+
+\subsection{Legal references: EU legislation and reports}
+
+
+\subsubsection*{EU regulation or directive, decision, recommendation or opinion}
+
+\begin{bibexbox}<RX>{eu.dir1984/2003}
+  Council Regulation (EC) 1984/2003 of 8 April 2003 introducing a system for the statistical monitoring of trade in bluefin tuna, swordfish and big eye tuna within the Community [2003] \emph{OJ} L295.
+  \tcblower
+\begin{Verbatim}
+@misc{eu.dir1984/2003,
+  title = {Council {Regulation} ({EC}) 1984/2003 of 8 {April} 2003 Introducing a System for
+    the Statistical Monitoring of Trade in Bluefin Tuna, Swordfish and Big Eye Tuna within
+    the {Community}},
+  titleaddon = {[2003] \emph{OJ} L295}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{hacks}
+\item Use \lstinline[style=dtxlatex]|\defcitealias| to provide a suitable citation string:
+\begin{tcblisting}{listing side text, lefthand width=.46\linewidth}
+\defcitealias{eu.dir1984/2003}{%
+  Council Regulation [EC] 1984/2003}
+\citepalias{eu.dir1984/2003}
+\end{tcblisting}
+\end{hacks}
+
+
+\subsubsection*{EU publication}
+
+\begin{bibexbox}<RX>{ec2015gra}
+  European Commission, 2015. \emph{General report on the activities of the European Union 2014}. Luxembourg:\@ Publications Office of the European Union.
+  \tcblower
+\begin{Verbatim}
+@techreport{ec2015gra,
+  author = {{European Commission}},
+  year = {2015},
+  title = {General Report on the Activities of the {European} {Union} 2014},
+  address = {Luxembourg},
+  publisher = {Publications Office of the European Union}}
+\end{Verbatim}
+\end{bibexbox}
+
+\subsection{Legal references: case reports}
+
+\subsubsection*{Legal case study}
+
+\begin{bibexbox}<RX>{seldon-v-c.w.j2012}
+  \emph{Seldon v.~Clarkson Wright \& Jakes}. [2012]. UKSC 16.
+  \tcblower
+\begin{Verbatim}
+@report{seldon-v-c.w.j2012,
+  title = {Seldon v.~{Clarkson} {Wright} \& {Jakes}},
+  note = {[2012]. UKSC 16}}
+\end{Verbatim}
+\end{bibexbox}
+
+\begin{info}\item
+Generally speaking, the year should be in square brackets if it is essential to the citation
+(unless it is a Scottish case, in which case it is printed bare), and in parentheses if it is
+not.
+\end{info}
+
+\subsubsection*{Judgment of the European Court of Justice}
+
+\begin{bibexbox}<RX>{srl.etal-v-comm2005}
+  \emph{Alessandrini Srl and others v.~Commission} (C-295/03 P) [2005] ECR I--5700.
+  \tcblower
+\begin{Verbatim}
+@report{srl.etal-v-comm2005,
+  title = {Alessandrini {Srl} and others v.~{Commission}},
+  titleaddon = {(C-295/03 P) [2005] ECR I--5700}}
+\end{Verbatim}
+\end{bibexbox}
+
+
+\bibliography{bath-bst-v1}
+\end{document}
+%% 
+%% Copyright (C) 2016-2021 by University of Bath
+%%
+%% End of file `bath-bst-v1.tex'.

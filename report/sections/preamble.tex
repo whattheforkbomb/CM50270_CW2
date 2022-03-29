@@ -1,0 +1,113 @@
+% Cover-page (Group Contributions)
+% Title \& Authors
+% ToC, ToF, ToT (Document Navigation Tables)
+% Anything else?
+
+% Tell TexCount to ignore words in word count
+%TC:ignore
+\pagenumbering{gobble} % Don't track page numbers prior to Table of Contents
+\thispagestyle{empty} % Remove Page Styling prior to Table of Contents
+\newgeometry{top=0.4\textheight,inner=0.2\textwidth,outer=0.2\textwidth}
+
+% Setup Group Contribution Form
+\vspace{0.25\textheight}
+\begin{center}
+    \LARGE Group 4 Contribution Form\\
+    \Large
+    \vspace{0.05\textheight}
+    % Want to tidy-up row-heights and text alignment
+    \begin{tabular}[0.9\textwidth]{@{}|m{0.3\textwidth}|m{0.3\textwidth}|m{0.3\textwidth}|@{}}
+        \hline
+        \textbf{Group Members} & \textbf{Contribution Level} & \textbf{Signatures} \\
+        \hline
+        ... & ... & \\
+        \hline
+        ... & ... & \\
+        \hline
+        ... & ... & \\
+        \hline
+        ... & ... & \\
+        \hline
+        ... & ... & \\
+        \hline
+        ... & ... & \\
+        \hline
+    \end{tabular}
+\end{center}
+\clearpage
+\newgeometry{inner=0.2\textwidth,outer=0.2\textwidth}
+\newpage
+
+% Setup title
+\title{Comparing Reinforcement Learning Approaches For Developing Agents To Play Super Mario Bros}
+\renewcommand\maketitlehookb{\centering \Large CM50270 - Coursework 2 - Group Report}
+\date{\today}
+\author{
+    % Authors
+    Cherian, Reebu \\
+    Department of Computer Science\\
+    University of Bath\\
+    Bath, BA2 7AY \\
+    \textit{...@bath.ac.uk} \\
+    \and
+    Davis, Daniel\\
+    Department of Computer Science\\
+    University of Bath\\
+    Bath, BA2 7AY \\
+    \textit{...@bath.ac.uk} \\
+    \and
+    Gan, Jia Lian\\
+    Department of Computer Science\\
+    University of Bath\\
+    Bath, BA2 7AY \\
+    \textit{...@bath.ac.uk} \\
+    \and
+    Partridge, Ryan\\
+    Department of Computer Science\\
+    University of Bath\\
+    Bath, BA2 7AY \\
+    \textit{...@bath.ac.uk} \\
+    \and
+    Whiffing, James\\
+    Department of Computer Science\\
+    University of Bath\\
+    Bath, BA2 7AY \\
+    \textit{jw2304@bath.ac.uk} \\
+    \and
+    Whitehorn, Seth\\
+    Department of Computer Science\\
+    University of Bath\\
+    Bath, BA2 7AY \\
+    \textit{...@bath.ac.uk} \\
+}
+
+\maketitle
+
+\clearpage
+\restoregeometry
+\newpage
+
+\setcounter{page}{0}
+\pagenumbering{roman}
+\pagestyle{fancy}
+
+%% Content Lists %%
+
+\tableofcontents
+\clearpage
+\newpage
+\addcontentsline{toc}{section}{\listfigurename}
+\listoffigures
+\clearpage
+\newpage
+\addcontentsline{toc}{section}{\listtablename}
+\listoftables
+\clearpage
+\newpage
+
+% Tell TexCount to start counting words again
+%TC:endignore
+
+% Reset Page Styling and numbering for rest of doc
+\setcounter{page}{1}
+\pagenumbering{arabic}

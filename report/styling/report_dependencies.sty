@@ -1,0 +1,140 @@
+%%
+%% Package includes
+%%
+\usepackage[final]{styling/rl_project}
+\usepackage{graphicx}   % Permits import of various graphics formats
+\usepackage{pdflscape}  % Provides landscape mode for end code listings
+\usepackage{multicol}   % Provides ability to split output into columns
+\usepackage{listings}   % Provides styled code listings
+\usepackage{textcomp}
+\usepackage{subcaption}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{wrapfig}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{titling}
+\usepackage{array}
+
+% Path to figures
+\graphicspath{{figures/}}
+
+% ToC config
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{2}
+
+% Hiding figures, tables, & sections from List of Figures, List of Tables, & Table of Contents respectively if present after appendix
+% Should these tables include content from appendix?
+\appto\appendix{
+  \addtocontents{toc}{\protect\setcounter{tocdepth}{0}} % Should main appendix sections be shown, or just show APPENDIX in the TOC?
+  \addtocontents{lof}{\protect\setcounter{tocdepth}{0}}
+  \addtocontents{lof}{\protect\setcounter{tocdepth}{0}}
+}
+\appto\listoffigures{\addtocontents{lof}{\protect\setcounter{tocdepth}{1}}}
+\appto\listoftables{\addtocontents{lot}{\protect\setcounter{tocdepth}{1}}}
+
+%%
+%% Set some page size changes from the standard article class
+%%
+% \usepackage[inner=2.5cm,outer=2.5cm]{geometry}
+%\usepackage{calc}
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{0pt}
+%\addtolength{\hoffset}{-0.5cm}
+%\addtolength{\textwidth}{2.5cm}
+\textheight = 9in
+\topmargin = -0.25in
+
+%% HREF Setup
+\hypersetup{
+  frenchlinks=true
+}
+\urlstyle{same}
+
+%% Header/Footer Setup
+\lhead{\leftmark}
+\chead{}
+\rhead{CM50270 - Group Report}
+\lfoot{}
+\cfoot{}
+\rfoot{\thepage}
+
+%%
+%% Format definitions for the style
+%%
+\newcommand*{\urlprefix}{Available from: }
+\newcommand*{\urldateprefix}{Accessed }
+\bibliographystyle{bath_harvard_reference_styling/bathx}
+% \pagestyle{headings}
+\fussy
+
+\newcommand{\textbfit}[1]{\textbf{\textit{#1}}} % Bold Italics
+
+\newcommand{\pcite}[1]{\citeauthor{#1}'s \citeyearpar{#1}} % Possessive Cite - Smith's (1999)
+\newcommand{\urlcite}[2]{\citeauthor{#1} (\citeyear{#1}, URL extension: #2)} % Cite with URL - Smith (1999, URL extension: /abc) - used if citation is for website, but specific in text reference for particular page
+
+\newcommand{\tempnote}[1]{\textbf{\textit{\textcolor{red}{#1}}}\\}
+\newenvironment{notes}
+  {\itshape\color{red}}
+  {}
+
+% LISTINGS
+
+% Python listing is just:
+% \begin{listing}[language=Python]
+%    ...
+% \end{listing}
+
+%% JavaScript Listings Language Def. - Src: https://tex.stackexchange.com/a/89576
+
+% \usepackage{color}
+% \definecolor{lightgray}{rgb}{.9,.9,.9}
+% \definecolor{darkgray}{rgb}{.4,.4,.4}
+% \definecolor{purple}{rgb}{0.65, 0.12, 0.82}
+
+% \lstdefinelanguage{JavaScript}{
+%   keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
+%   keywordstyle=\color{blue}\bfseries,
+%   ndkeywords={class, export, boolean, throw, implements, import, this},
+%   ndkeywordstyle=\color{darkgray}\bfseries,
+%   identifierstyle=\color{black},
+%   sensitive=false,
+%   comment=[l]{//},
+%   breaklines=true,
+%   breakatwhitespace=false,
+%   morecomment=[s]{/*}{*/},
+%   commentstyle=\color{purple}\ttfamily,
+%   stringstyle=\color{red}\ttfamily,
+%   morestring=[b]',
+%   morestring=[b]",
+%   emptylines=2
+% }
+
+% \lstset{
+%   language=JavaScript,
+%   extendedchars=true,
+%   basicstyle=\footnotesize\ttfamily,
+%   showstringspaces=false,
+%   showspaces=false,
+%   numbers=left,
+%   numberstyle=\footnotesize,
+%   numbersep=3pt,
+%   tabsize=2,
+%   breaklines=true,
+%   breakatwhitespace=false,
+%   showtabs=false,
+%   captionpos=b,
+%   columns=l
+% }
+
+
+%%
+%% END OF DEFINITIONS
+%%
+
