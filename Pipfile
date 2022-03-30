@@ -9,6 +9,8 @@ gym-super-mario-bros = "*"
 jupyter = "*"
 torch = "*"
 numpy = "*"
+torchvision = "*"
+matplotlib = "*"
 
 [dev-packages]
 
