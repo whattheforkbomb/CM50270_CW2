@@ -157,6 +157,14 @@ class ExperienceBuffer():
             offset += len
         return grouped
 
+    def pop_total_rewards(self) -> list:
+        """Returns a list of total rewards from the buffer and resets the list."""
+        rewards = self.total_rewards
+        if rewards:
+            self.total_rewards = []
+            self.total_steps = []
+        return rewards
+
 class FirstLastExpBuffer(ExperienceBuffer):
     """An experience replay buffer that focuses on the first and last set of experiences. Used in A2C."""
     def __init__(self, env: Union[gym.Env, list[gym.Env]], agent: BaseAgent, gamma: float, buffer_size: int = 1, steps_delta: int = 1) -> None:
