@@ -18,3 +18,11 @@ def set_device() -> str:
 def set_multi_processors(x: torch.Tensor, y: torch.Tensor) -> None:
     """Splits data across multiple GPU cores."""
     pass
+
+def save_model():
+    """Saves a models parameters with the given filepath."""
+    pass
+
+def load_model():
+    """Loads a saved model based on the given filepath."""
+    pass
