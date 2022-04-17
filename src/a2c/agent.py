@@ -24,6 +24,10 @@ class BaseAgent():
         A tuple of state-action pairs (actions, states)
         """
         raise NotImplementedError
+    
+    def unpack_batch(self, batch):
+        """Converts a batch of samples into torch tensors."""
+        raise NotImplementedError
 
 class A2C(BaseAgent):
     """A basic representation of an Advantage Actor-Critic agent."""
@@ -64,8 +68,8 @@ class A2C(BaseAgent):
             actions.append(np.random.choice(len(prob), p=prob))
         return np.array(actions)
 
-    def get_batch(self, batch: namedtuple) -> tuple[torch.Tensor]:
-        """Gets a batch of samples as tensors. Returns state variables, action values, and reference values (rewards)."""
+    def unpack_batch(self, batch: list) -> tuple[torch.Tensor]:
+        """Converts a batch of samples into torch tensors. Returns state variables, action values, and reference values (rewards)."""
         states, actions = [], []
         rewards, last_states = [], []
         incomplete_idx = []
