@@ -39,10 +39,6 @@ class ACNetwork(nn.Module):
             nn.Dropout(drop_prob),
             nn.Linear(512, 1)
         )
-        # self.dense_layers = nn.ModuleList([nn.Linear(conv_out_size, hidden_sizes[0])])
-        # layer_sizes = zip(hidden_sizes[:-1, hidden_sizes[1:]])
-        # self.dense_layers.extend([nn.Linear(h1, h2) for h1, h2 in layer_sizes])
-        # self.out = nn.Linear(hidden_sizes[-1], n_actions)
 
     def _get_conv_size(self, input_shape: tuple[int]):
         """Gets the convolutional layers output size."""
@@ -57,12 +53,3 @@ class ACNetwork(nn.Module):
         # 1. Return policy with probability distribution over actions
         # 2. Return single approximation of state value
         return self.policy(conv_out), self.value(conv_out)
-
-        # Pass data through each dense layer
-        # for linear in self.dense_layers:
-            # x = F.tanh(linear(x))
-            # x = self.dropout(x)
-        
-        # Handle output layer
-        # x = F.log_softmax(self.out(x), dim=1)
-        # return x
