@@ -44,6 +44,10 @@ def load_model(model: nn.Module, filename: str) -> None:
     # Load model parameters
     model.load_state_dict(checkpoint['parameters'])
 
+    print("Model loaded. Utility variables available:")
+    print("  advantages, state_values, rewards, policy,") 
+    print("  losses_policy, losses_sv, losses_entropy, losses_total")
+
 def set_multi_processors(x: torch.Tensor, y: torch.Tensor) -> None:
     """Splits data across multiple GPU cores."""
     pass
