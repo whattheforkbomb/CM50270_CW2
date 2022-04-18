@@ -4,7 +4,7 @@ from a2c.model import ACNetwork
 from a2c.agent import A2C
 from core.experience import FirstLastExpBuffer
 from core.tuning import Tuning
-from core.utils import set_device, set_multi_processors
+from core.utils import set_device
 
 from nes_py.wrappers import JoypadSpace
 import gym_super_mario_bros
@@ -42,28 +42,19 @@ def main() -> None:
 
     # Set core classes
     net = ACNetwork(input_shape=env.observation_space.shape, n_actions=env.action_space.n).to(device)
-
-    agent = A2C(
-        gamma=GAMMA, 
-        reward_steps=REWARD_STEPS, 
-        net=lambda x: net(x)[0], # policy only
-        device=device
-    )
-
+    agent = A2C(gamma=GAMMA, reward_steps=REWARD_STEPS, net=lambda x: net(x)[0], device=device) # policy only (net param)
     exp_buffer = FirstLastExpBuffer(env=env, agent=agent, gamma=GAMMA, buffer_size=REWARD_STEPS)
-
     optimizer = optim.Adam(net.parameters(), lr=LEARNING_RATE, eps=EPSILON)
-
-    tuner = Tuning(env=env, agent=agent, model=net, exp_buffer=exp_buffer, optimizer=optimizer, device=device)
+    tuner = Tuning(agent=agent, model=net, exp_buffer=exp_buffer, optimizer=optimizer)
 
     # Train model
     tuner.train(
         episode_count=args.episode_count,
         batch_size=BATCH_SIZE,
         entropy_beta=ENTROPY_BETA,
-        clip_grad=CLIP_GRAD
+        clip_grad=CLIP_GRAD,
+        filename='a2c'
     )
-    # tuner.validate()
 
 if __name__ == "__main__":
     main()

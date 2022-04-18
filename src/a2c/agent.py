@@ -1,4 +1,3 @@
-from collections import namedtuple
 import numpy as np
 
 from a2c.model import ACNetwork
@@ -30,7 +29,15 @@ class BaseAgent():
         raise NotImplementedError
 
 class A2C(BaseAgent):
-    """A basic representation of an Advantage Actor-Critic agent."""
+    """
+    A basic representation of an Advantage Actor-Critic agent.
+    
+    Parameters:
+    - gamma (float) - discount factor
+    - reward_steps (int) - action approximation metric
+    - net (ACNetwork) - neural network (model)
+    - device (str) - device type for cuda
+    """
     def __init__(self, gamma: float, reward_steps: int, net: ACNetwork, device: str) -> None:
         self.gamma = gamma
         self.reward_steps = reward_steps

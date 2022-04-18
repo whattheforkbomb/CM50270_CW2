@@ -166,7 +166,15 @@ class ExperienceBuffer():
         return rewards
 
 class FirstLastExpBuffer(ExperienceBuffer):
-    """An experience replay buffer that focuses on the first and last set of experiences. Used in A2C."""
+    """
+    An experience replay buffer that focuses on the first and last set of experiences. Used in A2C.
+    
+    Parameters:
+    - env (gym.Env or list[gym.Env]) environment(s) to use
+    - agent (BaseAgent) - agent to use
+    - buffer_size (int) - number of samples in the buffer per environment
+    - steps_delta (int) - number of steps between experience items
+    """
     def __init__(self, env: Union[gym.Env, list[gym.Env]], agent: BaseAgent, gamma: float, buffer_size: int = 1, steps_delta: int = 1) -> None:
         super().__init__(env, agent, buffer_size + 1, steps_delta)
         self.gamma = gamma
