@@ -1,3 +1,5 @@
+import numpy as np
+
 import torch
 from torch import Tensor
 import torch.nn as nn
@@ -10,46 +12,43 @@ class ACNetwork(nn.Module):
         input_shape (int) - image input shape
         n_actions (int) - number of actions
         hidden_sizes (list) - list of integers for hidden layer sizes
-        drop_prob (float) - dropout rate probability
     """
-    def __init__(self, input_shape: tuple[int], n_actions: int, drop_prob: float = 0.3) -> None:
+    def __init__(self, input_shape: tuple[int], n_actions: int) -> None:
         super().__init__()
         # Convolutional layers
         self.conv = nn.Sequential(
-            nn.Conv2d(input_shape[0], 32, kernel_size=8, stride=4), # 3, 2
+            nn.Conv2d(input_shape[0], 32, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.Conv2d(32, 64, kernel_size=4, stride=2),
+            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.Conv2d(64, 64, kernel_size=3, stride=1),
+            nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),
             nn.ReLU()
         )
         conv_out_size = self._get_conv_size(input_shape)
 
         # Dense layers
-        self.policy = nn.Sequential(
+        self.actor = nn.Sequential(
             nn.Linear(conv_out_size, 512),
             nn.ReLU(),
-            nn.Dropout(drop_prob),
             nn.Linear(512, n_actions)
-        )
+        ) # policy
 
-        self.value = nn.Sequential(
+        self.critic = nn.Sequential(
             nn.Linear(conv_out_size, 512),
             nn.ReLU(),
-            nn.Dropout(drop_prob),
             nn.Linear(512, 1)
-        )
+        ) # action-value function
 
     def _get_conv_size(self, input_shape: tuple[int]):
         """Gets the convolutional layers output size."""
         out = self.conv(torch.zeros(1, *input_shape))
-        return int(torch.prod(out.size()))
+        return int(np.prod(out.size()))
 
     def forward(self, x: Tensor) -> Tensor:
         """Forward propagates the features through the network."""
-        fx = x.float() / 256 # 
-        conv_out = self.conv(fx).view(fx.size()[0], -1)
+        x = x.float() / 256
+        conv_out = self.conv(x).view(x.size()[0], -1) # flatten
 
         # 1. Return policy with probability distribution over actions
         # 2. Return single approximation of state value
-        return self.policy(conv_out), self.value(conv_out)
+        return self.actor(conv_out), self.critic(conv_out)
