@@ -1,32 +1,35 @@
 import argparse
 
 from a2c.model import ACNetwork
-from a2c.agent import A2C
-from core.experience import FirstLastExpBuffer
+from a2c.agent import A2CAgent
+from a2c.multi_envs import MultiEnvs
 from core.tuning import Tuning
-from core.utils import set_device
+from utils.config import Config
+from utils.helper import set_device
 
 from nes_py.wrappers import JoypadSpace
 import gym_super_mario_bros
-from gym_super_mario_bros.actions import SIMPLE_MOVEMENT
+from gym_super_mario_bros.actions import RIGHT_ONLY
 import torch.optim as optim
 
-env = gym_super_mario_bros.make('SuperMarioBros-v0')
-env = JoypadSpace(env, SIMPLE_MOVEMENT)
-
+# Set hyperparameters
+ENV_NAME = 'SuperMarioBros-v0'
 GAMMA = 0.99
 LEARNING_RATE = 0.001
 EPSILON = 1e-3
-ENTROPY_BETA = 0.01
+ENTROPY_WEIGHT = 0.01
+VALUE_LOSS_WEIGHT = 0.01
 BATCH_SIZE = 128
-NUM_ENVS = 50
+NUM_AGENTS = 5
+N_STEPS = 4 # TD bootstrapping
+GRAD_CLIP = 0.1 # Prevents gradients from being too large
 
-# Threshold for gradient clipping
-# Prevents gradients from being too large
-CLIP_GRAD = 0.1
+# Create environment
+env = gym_super_mario_bros.make(ENV_NAME)
+env = JoypadSpace(env, RIGHT_ONLY)
 
-# Steps ahead to approx reward for every action
-REWARD_STEPS = 4
+# Set config instance
+config = Config()
 
 def parser_settings() -> argparse.Namespace:
     """Enables argument parsing in console and returns passed arguments."""
@@ -40,21 +43,41 @@ def main() -> None:
     args = parser_settings()
     device = set_device()
 
-    # Set core classes
-    net = ACNetwork(input_shape=env.observation_space.shape, n_actions=env.action_space.n).to(device)
-    agent = A2C(gamma=GAMMA, reward_steps=REWARD_STEPS, net=lambda x: net(x)[0], device=device) # policy only (net param)
-    exp_buffer = FirstLastExpBuffer(env=env, agent=agent, gamma=GAMMA, buffer_size=REWARD_STEPS)
-    optimizer = optim.Adam(net.parameters(), lr=LEARNING_RATE, eps=EPSILON)
-    tuner = Tuning(agent=agent, model=net, exp_buffer=exp_buffer, optimizer=optimizer)
-
-    # Train model
-    tuner.train(
-        episode_count=args.episode_count,
+    # Add core items to config
+    config.add(
+        game=ENV_NAME,
+        gamma=GAMMA,
+        lr=LEARNING_RATE,
+        epsilon=EPSILON,
+        entropy_weight=ENTROPY_WEIGHT,
+        value_loss_weight=VALUE_LOSS_WEIGHT,
         batch_size=BATCH_SIZE,
-        entropy_beta=ENTROPY_BETA,
-        clip_grad=CLIP_GRAD,
-        filename='a2c'
+        num_agents=NUM_AGENTS,
+        grad_clip=GRAD_CLIP,
+        rollout_size=N_STEPS,
+        device=device,
+        num_episodes=args.episode_count,
+        task_fn=lambda: MultiEnvs(ENV_NAME, num_envs=NUM_AGENTS)
     )
+
+    # Set core classes
+    a2c = ACNetwork(
+        env.observation_space.shape,
+        env.action_space.n
+    ).to(device)
+
+    config.add(
+        optimizer_fn=lambda params: optim.Adam(
+            params,
+            lr=config.lr,
+            eps=config.epsilon
+        ),
+        network_fn=lambda: a2c
+    )
+
+    # Train agent
+    agent = A2CAgent(config)
+    agent.train()
 
 if __name__ == "__main__":
     main()
