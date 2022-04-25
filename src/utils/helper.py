@@ -28,6 +28,7 @@ def to_numpy(x: torch.Tensor) -> np.array:
     """Converts a torch tensor to a numpy array."""
     return x.cpu().detach().numpy()
 
-def set_multi_processors(x: torch.Tensor, y: torch.Tensor) -> None:
-    """Splits data across multiple GPU cores."""
-    pass
+def set_multi_processors(device: str, gpu_id: int) -> None:
+    """Use multiple GPU processors."""
+    if device == 'cuda':
+        pass

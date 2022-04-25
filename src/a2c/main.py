@@ -1,9 +1,5 @@
-import argparse
-
 from a2c.model import ACNetwork
 from a2c.agent import A2CAgent
-from a2c.multi_envs import MultiEnvs
-from core.tuning import Tuning
 from utils.config import Config
 from utils.helper import set_device
 
@@ -18,11 +14,10 @@ GAMMA = 0.99
 LEARNING_RATE = 0.001
 EPSILON = 1e-3
 ENTROPY_WEIGHT = 0.01
-VALUE_LOSS_WEIGHT = 0.01
-BATCH_SIZE = 128
-NUM_AGENTS = 5
 N_STEPS = 4 # TD bootstrapping
 GRAD_CLIP = 0.1 # Prevents gradients from being too large
+NUM_EPISODES = 100
+SAVE_MODEL_FILENAME = 'a2c'
 
 # Create environment
 env = gym_super_mario_bros.make(ENV_NAME)
@@ -31,41 +26,34 @@ env = JoypadSpace(env, RIGHT_ONLY)
 # Set config instance
 config = Config()
 
-def parser_settings() -> argparse.Namespace:
-    """Enables argument parsing in console and returns passed arguments."""
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-eps", "--episode_count", required=True, help="Episode count (default=5000)", type=int, default=5000)
-    return parser.parse_args()
-
 def main() -> None:
     """Runs the main application."""
-    # Get console arguments and device
-    args = parser_settings()
+    # Set cuda device
     device = set_device()
 
     # Add core items to config
+    config = Config()
     config.add(
-        game=ENV_NAME,
+        env=env,
+        env_name=ENV_NAME,
         gamma=GAMMA,
         lr=LEARNING_RATE,
         epsilon=EPSILON,
         entropy_weight=ENTROPY_WEIGHT,
-        value_loss_weight=VALUE_LOSS_WEIGHT,
-        batch_size=BATCH_SIZE,
-        num_agents=NUM_AGENTS,
-        grad_clip=GRAD_CLIP,
         rollout_size=N_STEPS,
+        grad_clip=GRAD_CLIP,
         device=device,
-        num_episodes=args.episode_count,
-        task_fn=lambda: MultiEnvs(ENV_NAME, num_envs=NUM_AGENTS)
+        num_episodes=NUM_EPISODES,
+        filename=SAVE_MODEL_FILENAME
     )
 
-    # Set core classes
-    a2c = ACNetwork(
-        env.observation_space.shape,
-        env.action_space.n
-    ).to(device)
+    # Setup environment parameters
+    config.set_env_params()
 
+    # Create network
+    a2c = ACNetwork(config.input_shape, config.n_actions).to(device)
+
+    # Add optimizer and network to config
     config.add(
         optimizer_fn=lambda params: optim.Adam(
             params,

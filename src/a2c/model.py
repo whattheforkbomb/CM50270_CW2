@@ -3,6 +3,7 @@ import numpy as np
 import torch
 from torch import Tensor
 import torch.nn as nn
+import torch.nn.functional as F
 
 class ACNetwork(nn.Module):
     """
@@ -39,7 +40,7 @@ class ACNetwork(nn.Module):
             nn.Linear(512, 1)
         ) # action-value function
 
-    def _get_conv_size(self, input_shape: tuple[int]):
+    def _get_conv_size(self, input_shape: tuple[int]) -> int:
         """Gets the convolutional layers output size."""
         out = self.conv(torch.zeros(1, *input_shape))
         return int(np.prod(out.size()))
@@ -51,4 +52,4 @@ class ACNetwork(nn.Module):
 
         # 1. Return policy with probability distribution over actions
         # 2. Return single approximation of state value
-        return self.actor(conv_out), self.critic(conv_out)
+        return F.softmax(self.actor(conv_out), dim=1), self.critic(conv_out)
