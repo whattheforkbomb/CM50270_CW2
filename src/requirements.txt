@@ -3,3 +3,4 @@ pytorch==1.11.0
 cudatoolkit==11.3
 jupyterlab
 nes_py==8.1.8
+ipywidgets
