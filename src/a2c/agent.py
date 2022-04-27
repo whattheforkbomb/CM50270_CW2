@@ -10,46 +10,7 @@ import torch.nn as nn
 
 Experience = namedtuple('Experience', ['states', 'actions', 'rewards', 'dones'])
 
-class BaseAgent():
-    """Base class for RL agents."""
-    def save_model(self, filename: str, params_dict: dict) -> None:
-        """
-        Saves a models as the given filename.
-
-        Parameters:
-        - params_dict (dict) - parameters to store
-        - filename (str) - name of the saved model
-        """
-        torch.save(params_dict, f'saved_models/{filename}.pt')
-    
-    def load_model(self, model: nn.Module, filename: str) -> None:
-        """
-        Load a saved model based on the given filename and stores its parameters to a given model.
-
-        Parameters:
-        - model (nn.Module) - model to store parameters to
-        - filename (str) - name of the model to load    
-        """
-        checkpoint = torch.load(f'saved_models/{filename}.pt')
-
-        # Store variables as model attributes
-        for key, val in checkpoint.items():
-            if key != 'parameters':
-                setattr(model, key, val)
-
-        # Load model parameters
-        model.load_state_dict(checkpoint['parameters'])
-
-        print("Model loaded. Utility variables available:")
-        print("  ", end='')
-        for idx, key in enumerate(checkpoint.keys()):
-            if key != 'parameters':
-                if len(checkpoint.keys())-1 == idx:
-                    print(f'{key}.')
-                else:
-                    print(f"{key}, ", end='')
-
-class A2CAgent(BaseAgent):
+class A2CAgent():
     """
     A basic representation of an Advantage Actor-Critic agent.
     
@@ -62,7 +23,6 @@ class A2CAgent(BaseAgent):
         self.env = config.env
         self.network = config.network_fn()
         self.optimizer = config.optimizer_fn(self.network.parameters())
-        self.filename = config.filename
 
     def normalize_states(self, states: list) -> Union[np.array, torch.Tensor]:
         """Normalize a given list of states."""
@@ -70,11 +30,10 @@ class A2CAgent(BaseAgent):
             states = np.asarray(states)
         return (1.0 / 255) * states
 
-    def train(self) -> None:
+    def train(self, target_score: int = 300, print_every: int = 100) -> None:
         """Train the agent."""
         print(f'Running training with N-Steps: {self.config.rollout_size}')
         for i_episode in range(self.config.num_episodes):
-            print(f'({i_episode+1}/{self.config.num_episodes}) ', end='')
             states, actions, rewards, dones = [], [], [], []
             state = self.env.reset()
 
@@ -87,7 +46,7 @@ class A2CAgent(BaseAgent):
                 next_state, reward, done, _ = self.env.step(action)
                 
                 # Add values to lists
-                states.append(state.numpy())
+                states.append(state.cpu().numpy())
                 actions.append(action)
                 rewards.append(reward)
                 dones.append(done)
@@ -99,10 +58,32 @@ class A2CAgent(BaseAgent):
                 if done:
                     break
             
+            # Add episode actions to logger
+            self.config.logger.add_actions(actions)
+
             # Reflect on training data
-            print(f'Actions: {actions}', end='')
-            exp = Experience(to_tensor(states), to_tensor(actions), np.array(rewards), np.array(dones))
+            exp = Experience(to_tensor(states).to(self.config.device), to_tensor(actions), np.array(rewards), np.array(dones))
             self.reflect(exp)
+
+            # Output episode info
+            first_episode = i_episode == 0
+            last_episode = i_episode+1 == self.config.num_episodes
+            if i_episode % print_every == 0 or first_episode or last_episode:
+                episode_actions = self.config.logger.actions[i_episode]
+                episode_return = self.config.logger.avg_returns[i_episode]
+                episode_loss = self.config.logger.total_losses[i_episode]
+                if first_episode or last_episode:
+                    print(f'({i_episode+1}', end='')
+                else:
+                    print(f'({i_episode}', end='')
+                print(f'/{self.config.num_episodes})\tEpisode actions: {episode_actions}\tAvg return: {episode_return:.3f}\tTotal loss: {episode_loss:.3f}')
+
+            # Save model if goal achieved
+            avg_return = self.config.logger.avg_returns[i_episode]
+            if avg_return >= target_score:
+                print(f'Environment solved in {i_episode} episodes! Avg score: {avg_return:.3f}')
+                self.save_model()
+                break
 
     def reflect(self, experience: namedtuple) -> None:
         """Reflect on the generated experiences by training the model."""
@@ -114,15 +95,17 @@ class A2CAgent(BaseAgent):
         action_probs, state_values_est = self.network.forward(self.normalize_states(states))
         action_log_probs = action_probs.log()
         a = experience.actions.type(torch.LongTensor).view(-1, 1).detach()
-        action = action_log_probs.gather(1, a)
+        action = action_log_probs.gather(1, a.to(self.config.device))
 
-        advantages = state_values_true - state_values_est
+        advantages = state_values_true.to(self.config.device) - state_values_est
 
         entropy = (action_probs * action_log_probs).sum(1).mean()
         action_gain = (action * advantages).mean()
         value_loss = advantages.pow(2).mean()
         total_loss = value_loss - action_gain - self.config.entropy_weight * entropy
-        print(f', Total Loss: {total_loss}')
+
+        # Add total loss to logger
+        self.config.logger.add_loss(total_loss)
 
         # Backpropagate the network
         self.optimizer.zero_grad()
@@ -144,10 +127,10 @@ class A2CAgent(BaseAgent):
             next_return = self.network.forward(self.normalize_states(experience.states))[1].detach()
         
         # Add last state
-        svs.append(np.array(next_return))
+        svs.append(next_return.cpu().numpy())
         dones = np.flip(experience.dones)
 
-        avg_rewards.append(next_return.mean())
+        avg_rewards.append(next_return.cpu().mean())
         # Iterate over each reward (ignoring last state)
         for r in range(1, len(rewards)):
             # Set the current return
@@ -157,10 +140,20 @@ class A2CAgent(BaseAgent):
                 cur_return = 0
         
             # Add return to list and update to next one
-            svs.append(np.array(cur_return.detach()))
-            next_return = cur_return
+            svs.append(to_numpy(cur_return))
+            next_return = cur_return.cpu()
             avg_rewards.append(next_return.mean())
-        print(f', Avg return: {np.array(avg_rewards).mean():.3f}', end='')
+        
+        # Add avg return to logger
+        self.config.logger.add_return(np.array(avg_rewards).mean())
         
         svs.reverse()
         return to_tensor(svs)
+
+    def save_model(self) -> None:
+        """Saves the model's parameters."""
+        torch.save(self.network.state_dict(), f'saved_models/a2c.pt')
+    
+    def load_model(self) -> None:
+        """Load a saved model's parameters."""
+        self.network.load_state_dict(torch.load(f'saved_models/a2c.pt', map_location=self.config.device))
