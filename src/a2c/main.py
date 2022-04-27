@@ -2,6 +2,7 @@ from a2c.model import ACNetwork
 from a2c.agent import A2CAgent
 from utils.config import Config
 from utils.helper import set_device
+from utils.logger import Logger
 
 from nes_py.wrappers import JoypadSpace
 import gym_super_mario_bros
@@ -10,14 +11,15 @@ import torch.optim as optim
 
 # Set hyperparameters
 ENV_NAME = 'SuperMarioBros-v0'
+
 GAMMA = 0.99
 LEARNING_RATE = 0.001
 EPSILON = 1e-3
 ENTROPY_WEIGHT = 0.01
+
 N_STEPS = 4 # TD bootstrapping
 GRAD_CLIP = 0.1 # Prevents gradients from being too large
-NUM_EPISODES = 100
-SAVE_MODEL_FILENAME = 'a2c'
+NUM_EPISODES = 4000
 
 # Create environment
 env = gym_super_mario_bros.make(ENV_NAME)
@@ -32,7 +34,6 @@ def main() -> None:
     device = set_device()
 
     # Add core items to config
-    config = Config()
     config.add(
         env=env,
         env_name=ENV_NAME,
@@ -44,7 +45,7 @@ def main() -> None:
         grad_clip=GRAD_CLIP,
         device=device,
         num_episodes=NUM_EPISODES,
-        filename=SAVE_MODEL_FILENAME
+        logger=Logger()
     )
 
     # Setup environment parameters
