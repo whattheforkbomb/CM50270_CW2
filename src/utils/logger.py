@@ -1,18 +1,20 @@
+# https://pytorch.org/docs/stable/tensorboard.html
+
 class Logger():
     """Stores information for each episode iteration."""
     def __init__(self):
-        self.actions = []
-        self.avg_returns = []
-        self.total_losses = []
+        self.keys = ['actions', 'log_probs', 'entropys', 'env_info', 'avg_advantages', 'avg_returns', 'total_losses', 'policy_losses', 'value_losses', 'entropy_losses']
+        self.set_defaults()
 
-    def add_actions(self, actions: list) -> None:
-        """Add episode actions to the logger."""
-        self.actions.append(actions)
+    def add(self, **kwargs) -> None:
+        """Add episode items to respective lists in the logger."""
+        for key, val in kwargs.items():
+            if key not in self.keys:
+                raise RuntimeError('Undefined key')
+            
+            getattr(self, key).append(val)
 
-    def add_return(self, avg_return: float) -> None:
-        """Add the average return for the episode to the logger."""
-        self.avg_returns.append(avg_return)
-
-    def add_loss(self, total_loss: float) -> None:
-        """Add the total loss of an episode to the logger."""
-        self.total_losses.append(total_loss)
+    def set_defaults(self) -> None:
+        """Creates empty list values for all keys."""
+        for key in self.keys:
+            setattr(self, key, [])

@@ -24,11 +24,14 @@ def to_tensor(x: Union[list, np.array, torch.Tensor]) -> torch.Tensor:
         return x
     return torch.from_numpy(np.array(x))
 
-def to_numpy(x: torch.Tensor) -> np.array:
+def to_numpy(x: torch.Tensor, detach: bool = False) -> np.array:
     """Converts a torch tensor to a numpy array."""
-    return x.cpu().detach().numpy()
+    if detach:
+        return x.cpu().detach().numpy()
+    return x.cpu().numpy()
 
-def set_multi_processors(device: str, gpu_id: int) -> None:
-    """Use multiple GPU processors."""
-    if device == 'cuda':
-        pass
+def normalize_states(states: Union[list, np.array, torch.Tensor]) -> Union[np.array, torch.Tensor]:
+    """Normalize a given list of states."""
+    if not isinstance(states, torch.Tensor):
+        states = np.asarray(states)
+    return (1.0 / 255) * states
