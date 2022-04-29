@@ -1,6 +1,6 @@
 from a2c.agent import A2CAgent
 from a2c.model import ACNetwork
-from a2c.wrappers import ResizeObservation, SkipFrame
+from utils.wrappers import ResizeObservation, SkipFrame
 from utils.config import Config
 from utils.helper import set_device
 

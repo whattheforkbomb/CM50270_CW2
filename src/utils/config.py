@@ -1,3 +1,4 @@
+
 class Config():
     """A class that stores core configuration variables."""
     def add(self, **kwargs) -> None:

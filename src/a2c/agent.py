@@ -1,6 +1,6 @@
 import numpy as np
 
-from a2c.storage import Storage
+from utils.storage import Storage
 from utils.config import Config
 from utils.logger import Logger
 from utils.helper import normalize_states, set_device, to_tensor
