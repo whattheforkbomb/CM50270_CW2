@@ -5,7 +5,7 @@ from utils.config import Config
 from utils.helper import set_device
 
 import gym_super_mario_bros
-from gym_super_mario_bros.actions import RIGHT_ONLY
+from gym_super_mario_bros.actions import SIMPLE_MOVEMENT
 from gym.wrappers import FrameStack, GrayScaleObservation
 from nes_py.wrappers import JoypadSpace
 
@@ -26,7 +26,7 @@ NUM_EPISODES = 1000
 
 # Create environment
 env = gym_super_mario_bros.make(ENV_NAME)
-env = JoypadSpace(env, RIGHT_ONLY)
+env = JoypadSpace(env, SIMPLE_MOVEMENT)
 
 # Apply wrappers to environment
 env = SkipFrame(env, skip=4)
@@ -35,41 +35,38 @@ env = ResizeObservation(env, shape=84) # image dim: [84, 84]
 env = FrameStack(env, num_stack=4) # 4 frames at a time
 
 # Set config instance
-config = Config()
+config = Config(env=env, env_name=ENV_NAME)
 
 def main() -> None:
     """Runs the main application."""
     # Set cuda device
     device = set_device()
 
-    # Add core items to config
+    # Create network and optimizer
+    network = ACNetwork(config.input_shape, config.n_actions).to(device)
+    optimizer = optim.Adam(network.parameters(), lr=LEARNING_RATE, eps=EPSILON)
+
+    # Add hyperparameters to config
     config.add(
-        env=env,
-        env_name=ENV_NAME,
         discount=GAMMA,
         entropy_weight=ENTROPY_WEIGHT,
         value_loss_weight=VALUE_LOSS_WEIGHT,
         rollout_size=N_STEPS,
         grad_clip=GRAD_CLIP,
         device=device,
-        num_episodes=NUM_EPISODES
-    )
-
-    # Setup environment parameters
-    config.set_env_params()
-
-    # Create networks
-    network = ACNetwork(config.input_shape, config.n_actions).to(device)
-
-    # Add networks and optimizers to config
-    config.add(
+        num_episodes=NUM_EPISODES,
         network=network,
-        optimizer = optim.Adam(network.parameters(), lr=LEARNING_RATE, eps=EPSILON)
+        optimizer=optimizer
     )
 
-    # Train agent
+    # Create agent instance
     agent = A2CAgent(config)
-    agent.train()
+    
+    # Train agent
+    agent.train(save_count=500)
+
+    # Tune agent
+    # agent.tuning(rollout_sizes=[10, 50, 100], print_every=5000, save_count=20000)
 
 if __name__ == "__main__":
     main()

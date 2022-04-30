@@ -1,9 +1,10 @@
+import os
 import numpy as np
 
 from utils.storage import Storage
 from utils.config import Config
 from utils.logger import Logger
-from utils.helper import normalize_states, set_device, to_tensor
+from utils.helper import human_format_number, normalize_states, set_device, to_tensor
 
 import torch
 import torch.nn as nn
@@ -16,19 +17,23 @@ class A2CAgent():
     - config (Config) - class of config variables
     """
     def __init__(self, config: Config) -> None:
-        super().__init__()
         self.config = config
-        self.env = config.env
         self.network = config.network
         self.optimizer = config.optimizer
         self.logger = Logger()
 
-    def train(self, target_score: int = 300, save_count: int = 1000, print_every: int = 100) -> None:
+    def train(self, print_every: int = 100, save_count: int = 1000) -> None:
         """Train the agent."""
-        print(f'Running training with rollout length {self.config.rollout_size}.')
+        print(f'Running training with rollout length {self.config.rollout_size} on {self.config.num_episodes} episodes.')
+        # Set saving batch metrics
+        self.start_ep = 1
+        self.ep_batch_score = 0.
+        self.ep_batch_losses = []
+
+        # Iterate over each episode
         for i_episode in range(self.config.num_episodes):
             actions, log_probs, entropys, env_info = [], [], [], []
-            state = self.env.reset()
+            state = self.config.env.reset()
             self.storage = Storage(self.config.rollout_size) # reset each episode
 
             # Get training data
@@ -41,7 +46,7 @@ class A2CAgent():
                 preds = self.get_predictions(action_probs)
                 
                 # Step through the enviornment
-                next_state, reward, done, info = self.env.step(preds['action'].item())
+                next_state, reward, done, info = self.config.env.step(preds['action'].item())
 
                 # Add info to storage
                 self.storage.add(
@@ -80,11 +85,7 @@ class A2CAgent():
             self._update_network(state)
 
             # Output episode info
-            self._output_stats(i_episode, print_every)
-
-            # Save model every save count or when goal has been achieved
-            if self._save_model_conditions(i_episode, save_count, target_score):
-                break
+            self._output_stats(i_episode, print_every, save_count)
 
     @staticmethod
     def get_predictions(action_probs: torch.Tensor) -> dict:
@@ -147,10 +148,15 @@ class A2CAgent():
         entropy_loss = entries.entropys.mean()
         total_loss = policy_loss - self.config.entropy_weight * entropy_loss + self.config.value_loss_weight * value_loss
 
+        # Update episode batch metrics
+        avg_return = entries.next_returns.mean().item()
+        self.ep_batch_score += avg_return
+        self.ep_batch_losses.append(total_loss)
+
         # Add info to logger
         self.logger.add(
             avg_advantages=entries.advantages.mean().item(), 
-            avg_returns=entries.next_returns.mean().item(), 
+            avg_returns=avg_return, 
             total_losses=total_loss.item(),
             policy_losses=policy_loss.item(),
             value_losses=value_loss.item(),
@@ -163,51 +169,81 @@ class A2CAgent():
         nn.utils.clip_grad_norm_(self.network.parameters(), self.config.grad_clip)
         self.optimizer.step()
 
-    def _output_stats(self, i_episode: int, print_every: int) -> None:
+    def _output_stats(self, i_episode: int, print_every: int, save_count: int) -> None:
         """Returns information to the console."""
         first_episode = i_episode == 0
         last_episode = i_episode+1 == self.config.num_episodes
 
-        if i_episode % print_every == 0 or first_episode or last_episode:
-            episode_actions = self.logger.actions[i_episode]
+        if first_episode or last_episode or i_episode % print_every == 0:
             episode_return = self.logger.avg_returns[i_episode]
             episode_loss = self.logger.total_losses[i_episode]
 
             if first_episode or last_episode:
-                print(f'({i_episode+1}', end='')
-            else:
-                print(f'({i_episode}', end='')
+                i_episode += 1
 
-            print(f'/{self.config.num_episodes}) ', end='')
-            if not isinstance(episode_actions, int) and len(episode_actions) <= 10:
-                print(f'Episode actions: {episode_actions}', end='')
-            print(f'\tAvg return: {episode_return:.3f}\tTotal loss: {episode_loss:.3f}')
+            ep_idx, ep_letter = human_format_number(i_episode)
+            ep_total_idx, ep_total_letter = human_format_number(self.config.num_episodes)
 
-    def _save_model_conditions(self, i_episode: int, save_count: int, target_score: int) -> bool:
-        avg_return = self.logger.avg_returns[i_episode]
-        total_loss = self.logger.total_losses[i_episode]
-        if i_episode+1 % save_count == 0:
-            print(f'Saved model at episode {i_episode+1}. Avg return: {avg_return:.3f}\tTotal loss: {total_loss:.3f}')
-            
-        if avg_return >= target_score:
-            print(f"Completed environment in {i_episode+1}'s! Avg return: {avg_return:.3f}\tTotal loss: {total_loss:.3f}")
-            self.save_model()
-            return True
-        return False
+            if ep_letter == '':
+                ep_idx = int(ep_idx)
+                
+            print(f'({ep_idx}{ep_letter}/{int(ep_total_idx)}{ep_total_letter}) ', end='')
+            print(f'Episode avg return: {episode_return:.3f}\tEpisode total loss: {episode_loss:.3f}\tAccumulated batch total avg return: {self.ep_batch_score:.3f}')
 
-    def save_model(self) -> None:
-        """Saves the model's parameters."""
+            # Save model every 'print_every' steps
+            self._save_model_conditions(i_episode, save_count, [int(ep_idx), ep_letter])
+
+    def _save_model_conditions(self, i_episode: int, save_count: int, ep_items: list) -> None:
+        if i_episode % save_count == 0:
+            # Calculate avg batch loss
+            self.ep_batch_loss = torch.stack(self.ep_batch_losses).mean().item()
+
+            # Add values to logger
+            self.logger.add(save_batch_stats={
+                'ep_range': [self.start_ep, i_episode], 
+                'avg_return': self.ep_batch_score,
+                'avg_total_loss': self.ep_batch_loss
+            })
+
+            # Save model
+            filename = f'a2c_rollout{self.config.rollout_size}_ep{ep_items[0]}{ep_items[1]}'.lower()
+            self.save_model(filename)
+            print(f"Saved model at episode {i_episode} as: '{filename}'.")
+            print(f"  Batch total avg return: {self.ep_batch_score:.3f}")
+            print(f"  Batch avg total loss: {self.ep_batch_loss:.3f}")
+
+            # Reset batch values
+            self.start_ep = i_episode+1
+            self.ep_batch_score = 0.
+            self.ep_batch_losses.clear()
+
+    def save_model(self, filename: str, folder_name: str = 'saved_models') -> None:
+        """Saves a model's state dict, config object and logger object to the desired 'folder_name'."""
+        if not os.path.exists(folder_name):
+            os.mkdir(folder_name)
+
         param_dict = dict(
             model=self.network.state_dict(), 
             config=self.config,
             logger=self.logger
         )
-        torch.save(param_dict, f'saved_models/a2c.pt')
+        torch.save(param_dict, f'{folder_name}/{filename}.pt')
     
-    def load_model(self) -> None:
-        """Load a saved model's parameters."""
-        checkpoint = torch.load(f'saved_models/a2c.pt', map_location=set_device())
-        self.network.load_state_dict(checkpoint.get('model'))
+    def load_model(self, filename: str, folder_name: str = 'saved_models') -> None:
+        """Load a saved model's parameters. Must be stored within the desired 'folder_name'."""
+        checkpoint = torch.load(f'{folder_name}/{filename}.pt', map_location=set_device())
+
         self.config = checkpoint.get('config')
         self.logger = checkpoint.get('logger')
-        print('Loaded A2C model.')
+
+        self.network = self.config.network
+        self.optimizer = self.config.optimizer
+        self.network.load_state_dict(checkpoint.get('model'))
+        print(f"Loaded A2C model: '{filename}'.")
+
+    def tuning(self, rollout_sizes: list, print_every: int, save_count: int) -> None:
+        """Trains the model on multiple rollout sizes."""
+        for size in rollout_sizes:
+            self.config.rollout_size = size
+            self.train(print_every=print_every, save_count=save_count)
+

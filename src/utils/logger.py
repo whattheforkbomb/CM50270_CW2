@@ -3,7 +3,7 @@
 class Logger():
     """Stores information for each episode iteration."""
     def __init__(self):
-        self.keys = ['actions', 'log_probs', 'entropys', 'env_info', 'avg_advantages', 'avg_returns', 'total_losses', 'policy_losses', 'value_losses', 'entropy_losses']
+        self.keys = ['actions', 'log_probs', 'entropys', 'env_info', 'avg_advantages', 'avg_returns', 'total_losses', 'policy_losses', 'value_losses', 'entropy_losses', 'save_batch_stats']
         self.set_defaults()
 
     def add(self, **kwargs) -> None:
