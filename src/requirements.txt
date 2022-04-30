@@ -1,6 +1,3 @@
-gym-super-mario-bros==7.3.2
-pytorch==1.11.0
-cudatoolkit==11.3
-jupyterlab
-nes_py==8.1.8
+gym-super-mario-bros
 ipywidgets
+nes_py
