@@ -31,7 +31,8 @@ class A2CAgent():
 
         # Parallelise if multiple devices
         if torch.cuda.device_count() > 1:
-            self.network = nn.DataParallel(self.network)
+            device_names = [f'cuda:{i}' for i in range(1, torch.cuda.device_count()-1)]
+            self.network = nn.DataParallel(self.network, device_ids=device_names, output_device='cuda:1')
         
         # Set output to primary device
         self.network = self.network.to(device)

@@ -14,9 +14,10 @@ def get_primary_device(count: int) -> str:
         return "cpu"
     elif count == 1:
         print(f'Single CUDA device available. Device set to GPU.')
+        return "cuda:0"
     else:
-        print(f'{count} CUDA devices available. Device set to first GPU.')
-    return "cuda:0"
+        print(f'{count} CUDA devices available. Device set to second GPU.')
+    return "cuda:1"
 
 def to_tensor(x: Union[list, np.array, torch.Tensor]) -> torch.Tensor:
     """Converts a list or numpy array to a torch tensor."""
