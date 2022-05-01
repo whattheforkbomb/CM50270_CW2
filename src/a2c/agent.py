@@ -4,7 +4,7 @@ import numpy as np
 from utils.storage import Storage
 from utils.config import Config
 from utils.logger import Logger
-from utils.helper import human_format_number, normalize_states, set_device, to_tensor
+from utils.helper import human_format_number, normalize_states, to_tensor
 
 import torch
 import torch.nn as nn
@@ -15,10 +15,12 @@ class A2CAgent():
     
     Parameters:
     - config (Config) - class of config variables
+    - device (string) - name of CUDA device (cpu, cuda:0, ...)
     """
-    def __init__(self, config: Config) -> None:
+    def __init__(self, config: Config, device: str) -> None:
         self.config = config
-        self.network = config.network
+        self.config.add(device=device)
+        self.network = config.network.to(device)
         self.optimizer = config.optimizer
         self.logger = Logger()
 
@@ -229,21 +231,14 @@ class A2CAgent():
         )
         torch.save(param_dict, f'{folder_name}/{filename}.pt')
     
-    def load_model(self, filename: str, folder_name: str = 'saved_models') -> None:
+    def load_model(self, filename: str, device: str, folder_name: str = 'saved_models') -> None:
         """Load a saved model's parameters. Must be stored within the desired 'folder_name'."""
-        checkpoint = torch.load(f'{folder_name}/{filename}.pt', map_location=set_device())
+        checkpoint = torch.load(f'{folder_name}/{filename}.pt', map_location=device)
 
         self.config = checkpoint.get('config')
         self.logger = checkpoint.get('logger')
 
-        self.network = self.config.network
+        self.network = self.config.network.to(device)
         self.optimizer = self.config.optimizer
         self.network.load_state_dict(checkpoint.get('model'))
         print(f"Loaded A2C model: '{filename}'.")
-
-    def tuning(self, rollout_sizes: list, print_every: int, save_count: int) -> None:
-        """Trains the model on multiple rollout sizes."""
-        for size in rollout_sizes:
-            self.config.rollout_size = size
-            self.train(print_every=print_every, save_count=save_count)
-
