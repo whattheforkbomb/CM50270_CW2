@@ -2,7 +2,7 @@ from a2c.agent import A2CAgent
 from a2c.model import ACNetwork
 from utils.wrappers import ResizeObservation, SkipFrame
 from utils.config import Config
-from utils.helper import get_cuda_device_names
+from utils.helper import get_primary_device
 
 import gym_super_mario_bros
 from gym_super_mario_bros.actions import SIMPLE_MOVEMENT
@@ -29,13 +29,12 @@ def tuning(config: Config, rollout_sizes: list, print_every: int, save_count: in
     """Trains the model on multiple rollout sizes."""
     # Get device names
     device_count = torch.cuda.device_count()
-    device_names = get_cuda_device_names(device_count)
+    device = get_primary_device(count=device_count)
 
-    for device in device_names:
-        for size in rollout_sizes:
-            agent = A2CAgent(config, device=device)
-            agent.config.rollout_size = size
-            agent.train(print_every=print_every, save_count=save_count)
+    for size in rollout_sizes:
+        agent = A2CAgent(config, device=device)
+        agent.config.rollout_size = size
+        agent.train(print_every=print_every, save_count=save_count)
 
 def main() -> None:
     """Runs the main application."""

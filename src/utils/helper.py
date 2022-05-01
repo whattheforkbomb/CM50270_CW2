@@ -7,18 +7,16 @@ import numpy as np
 
 import torch
 
-def get_cuda_device_names(count: int) -> Union[str, list[str]]:
-    """Gets the device names for single GPU, CPU or multiple GPUs."""
+def get_primary_device(count: int) -> str:
+    """Gets the primary CUDA device name for single GPU, CPU or multiple GPUs."""
     if count == 0:
-        device = ["cpu"]
         print("CUDA unavailable. Device set to CPU.")
+        return "cpu"
     elif count == 1:
-        device = ["cuda:0"]
         print(f'Single CUDA device available. Device set to GPU.')
     else:
-        device = [f"cuda:{i}" for i in range(count)]
-        print(f'{count} CUDA devices available.')
-    return device
+        print(f'{count} CUDA devices available. Device set to first GPU.')
+    return "cuda:0"
 
 def to_tensor(x: Union[list, np.array, torch.Tensor]) -> torch.Tensor:
     """Converts a list or numpy array to a torch tensor."""

@@ -15,14 +15,26 @@ class A2CAgent():
     
     Parameters:
     - config (Config) - class of config variables
-    - device (string) - name of CUDA device (cpu, cuda:0, ...)
+    - device (str) - name of primary CUDA device (cpu, cuda:0, ...)
     """
     def __init__(self, config: Config, device: str) -> None:
         self.config = config
-        self.config.add(device=device)
-        self.network = config.network.to(device)
+        self.network = self.config.network
         self.optimizer = config.optimizer
         self.logger = Logger()
+        
+        # Add device to config
+        self.config.add(device = {
+            'primary': device,
+            'trained_count': torch.cuda.device_count()
+        })
+
+        # Parallelise if multiple devices
+        if torch.cuda.device_count() > 1:
+            self.network = nn.DataParallel(self.network)
+        
+        # Set output to primary device
+        self.network = self.network.to(device)
 
     def train(self, print_every: int = 100, save_count: int = 1000) -> None:
         """Train the agent."""
@@ -41,7 +53,7 @@ class A2CAgent():
             # Get training data
             for _ in range(self.config.rollout_size):
                 # Calculate policy
-                state = to_tensor(state).to(self.config.device)
+                state = to_tensor(state).to(self.config.device['primary'])
                 action_probs, state_value = self.network.forward(normalize_states(state.unsqueeze(0)))
                 
                 # Get predictions
@@ -105,7 +117,7 @@ class A2CAgent():
     def _update_network(self, next_state: torch.Tensor) -> None:
         """Update the networks based on the generated experience."""
         # Get the action probs and state-value estimates
-        next_state = to_tensor(next_state).to(self.config.device)
+        next_state = to_tensor(next_state).to(self.config.device['primary'])
         action_probs, next_return = self.network.forward(normalize_states(next_state).unsqueeze(0))
 
         # Get predictions
