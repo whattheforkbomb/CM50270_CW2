@@ -251,6 +251,7 @@ class A2CAgent():
         self.config = checkpoint.get('config')
         self.logger = checkpoint.get('logger')
 
+        self.config.device = device
         self.network = self.config.network.to(device)
         self.optimizer = self.config.optimizer
         self.network.load_state_dict(checkpoint.get('model'))
