@@ -234,8 +234,7 @@ class A2CAgent():
 
     def save_model(self, filename: str, folder_name: str = 'saved_models') -> None:
         """Saves a model's state dict, config object and logger object to the desired 'folder_name'."""
-        if not os.path.exists(folder_name):
-            os.mkdir(folder_name)
+        os.makedirs(folder_name, exist_ok=True)
 
         param_dict = dict(
             model=self.network.state_dict(), 

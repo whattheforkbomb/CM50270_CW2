@@ -37,10 +37,10 @@ def normalize_states(states: Union[list, np.array, torch.Tensor]) -> Union[np.ar
         states = np.asarray(states)
     return (1.0 / 255) * states
 
-def human_format_number(num: int) -> str:
+def human_format_number(num: int) -> tuple[int, str]:
     """Returns a number as a string in human readable format. For example: 1000 -> 1k."""
     letters = ['', 'K', 'M', 'G', 'T', 'P']
     condition = 0 if num == 0 else math.log10(abs(num)) / 3
     idx = max(0, min(len(letters)-1, int(math.floor(condition))))
     num /= 10 ** (3 * idx)
-    return [num, letters[idx]]
+    return num, letters[idx]

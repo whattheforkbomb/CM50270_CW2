@@ -1,3 +1,0 @@
-gym-super-mario-bros
-ipywidgets
-nes_py

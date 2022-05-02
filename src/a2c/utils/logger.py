@@ -1,4 +1,3 @@
-# https://pytorch.org/docs/stable/tensorboard.html
 
 class Logger():
     """Stores information for each episode iteration."""
