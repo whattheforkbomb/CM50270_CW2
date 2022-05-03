@@ -1,9 +1,0 @@
-gym-super-mario-bros
-jupyterlab
-ipywidgets
-opencv-python
-matplotlib
-seaborn
-ipython
-nes_py
-pytorch
