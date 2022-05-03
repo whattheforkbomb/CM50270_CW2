@@ -56,7 +56,7 @@ def get_param_f(img):
 
   return stacked_param_f
 
-def feature_inversion(img, layer, img_path, n_steps=512, cossim_pow=0.0):  
+def feature_inversion(img, layer, n_steps=512, cossim_pow=0.0):  
   obj = objectives.Objective.sum([
     1.0 * dot_compare(layer, cossim_pow=cossim_pow),
     objectives.blur_input_each_step(),
