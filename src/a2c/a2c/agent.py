@@ -253,5 +253,5 @@ class A2CAgent():
         self.config.device = device
         self.network = self.config.network.to(device)
         self.optimizer = self.config.optimizer
-        self.network.load_state_dict(checkpoint.get('model'))
+        self.network.load_state_dict(checkpoint.get('model'), strict=False)
         print(f"Loaded A2C model: '{filename}'.")
