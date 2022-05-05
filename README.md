@@ -11,6 +11,9 @@ conda create --name $ENV_NAME --file requirements.txt
 This will create a conda environment called `$ENV_NAME`, which can be activated with the following:
 ```bash
 conda activate $ENV_NAME
+# Install pip-only dependencies
+pip install gym-super-mario-bros
+pip install torch-lucent
 ```
 If you wish to use conda and do not already have it installed, please follow the installation instructions found here: https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html
 
